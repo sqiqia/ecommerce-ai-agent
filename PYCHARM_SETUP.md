@@ -179,3 +179,35 @@ user_prompt
 ```
 
 这三个字段就是下一小步调用真实大模型时要使用的数据。
+
+## 11. 第八步 8.2.1：建立真实大模型调用层
+
+这一小步新增了：
+
+```text
+app/services/ai_client.py       调用兼容 Chat Completions 格式的大模型服务
+POST /copywriting/generate      生成结构化商品文案
+tests/test_ai_client.py         使用模拟网络响应测试，不产生 API 费用
+```
+
+系统会从本机 `.env` 读取下面四项配置：
+
+```text
+AI_API_KEY=
+AI_BASE_URL=
+AI_MODEL=
+AI_TIMEOUT_SECONDS=30
+```
+
+真实 API Key 只能填写在 `.env`，不能填写在 Python 文件、`.env.example`、截图或
+聊天消息中。`.env` 已经被 `.gitignore` 排除，不会上传到 GitHub。
+
+当前先执行自动化测试：
+
+```powershell
+python -m pytest tests/test_ai_client.py tests/test_copywriting_api.py -q
+python -m pytest -q
+```
+
+测试中的 `test-key`、`ai.example.com` 和 `fake-model` 都是假的测试数据，不会连接
+外部大模型。下一小步 8.2.2 再选择服务商，并在本机填写真实配置。

@@ -14,6 +14,7 @@
 - 历史任务列表：`GET /tasks`
 - 任务详情：`GET /tasks/{task_id}`
 - AI 文案 Prompt 预览：`POST /copywriting/prompt-preview`
+- AI 商品文案生成：`POST /copywriting/generate`
 
 查看本地 SQLite 数据库概要：
 
@@ -32,8 +33,9 @@ python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 
 打开：<http://127.0.0.1:8000/docs>
 
-当前 AI 文案模块已经完成 Prompt 构建和预览。真实大模型 API 调用将在下一阶段接入，
-因此本阶段无需填写 `AI_API_KEY`。
+AI 文案模块支持兼容 Chat Completions 格式的大模型服务。真实调用前，需要在本机
+`.env` 中填写 `AI_API_KEY`、`AI_BASE_URL` 和 `AI_MODEL`。不要把真实 Key 写入
+代码、`.env.example` 或提交到 GitHub。
 
 ## 测试
 

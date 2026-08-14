@@ -57,3 +57,20 @@ class CopywritingPromptResponse(BaseModel):
     prompt_version: str
     system_prompt: str
     user_prompt: str
+
+
+class GeneratedCopywriting(BaseModel):
+    """大模型生成并经过校验的文案内容。"""
+
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    title: str = Field(min_length=1, max_length=40)
+    selling_copy: str = Field(min_length=1, max_length=500)
+    call_to_action: str = Field(min_length=1, max_length=100)
+
+
+class CopywritingGenerateResponse(GeneratedCopywriting):
+    """文案生成接口最终返回的数据。"""
+
+    model: str
+    prompt_version: str

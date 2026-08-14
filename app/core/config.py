@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -14,6 +15,7 @@ class Settings(BaseSettings):
     ai_api_key: str = ""
     ai_base_url: str = ""
     ai_model: str = ""
+    ai_timeout_seconds: float = Field(default=30, gt=0, le=120)
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",
