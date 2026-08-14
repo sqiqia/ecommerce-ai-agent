@@ -139,3 +139,43 @@ python -m pip install -r requirements.txt
 当前方式是本地部署，只能在本机使用。它适合开发、学习、测试和面试演示。
 
 项目全部功能完成后，再进行公网部署。届时通常需要云服务器，并增加 Docker、PostgreSQL、Redis 和 Nginx。现阶段不安装这些工具，避免同时引入过多问题。
+
+## 10. 第八步 8.1：预览 AI 文案 Prompt
+
+这一小步先完成 Prompt 构建，不调用收费的大模型 API。新增文件：
+
+```text
+app/schemas/copywriting.py          定义商品信息输入和 Prompt 输出格式
+app/services/prompt_service.py      把商品信息组装成标准 Prompt
+app/api/routes/copywriting.py       提供 Prompt 预览接口
+tests/test_copywriting_api.py       验证正常输入和错误输入
+```
+
+启动项目后打开 `http://127.0.0.1:8000/docs`，找到 `AI 文案` 分组，展开：
+
+```text
+POST /copywriting/prompt-preview
+```
+
+点击 `Try it out`，输入：
+
+```json
+{
+  "product_name": "无线鼠标",
+  "selling_points": ["静音按键", "蓝牙双模", "轻巧便携"],
+  "target_audience": "经常出差的职场人士",
+  "platform": "小红书",
+  "tone": "亲切",
+  "keywords": ["办公好物", "便携"]
+}
+```
+
+点击 `Execute`。预期状态码是 `200`，返回内容包含：
+
+```text
+prompt_version
+system_prompt
+user_prompt
+```
+
+这三个字段就是下一小步调用真实大模型时要使用的数据。

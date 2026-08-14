@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from app.api.routes.copywriting import router as copywriting_router
 from app.api.routes.health import router as health_router
 from app.api.routes.products import router as products_router
 from app.api.routes.tasks import router as tasks_router
@@ -22,6 +23,7 @@ def create_app() -> FastAPI:
         description="商品数据分析、利润计算、AI 文案生成和自动化处理系统",
         lifespan=lifespan,
     )
+    application.include_router(copywriting_router)
     application.include_router(health_router)
     application.include_router(products_router)
     application.include_router(tasks_router)
