@@ -22,6 +22,7 @@
         </a>
         <nav class="topnav" aria-label="主要导航">
             <a href="#overview">项目概览</a>
+            <a href="#agent">运营 Agent</a>
             <a href="#copywriting">AI 文案</a>
             <a href="#profit">利润测算</a>
             <a href="#batch">批量分析</a>
@@ -43,7 +44,7 @@
                     测算单品利润，也可以上传 Excel 完成批量分析并保存任务记录。
                 </p>
                 <div class="hero-actions">
-                    <a class="primary-action" href="#copywriting">开始生成 AI 文案</a>
+                    <a class="primary-action" href="#agent">启动运营 Agent</a>
                     <a class="secondary-action" href="#modules">了解全部能力</a>
                 </div>
                 <div class="hero-meta">
@@ -85,31 +86,37 @@
             <div class="section-heading compact-heading">
                 <div>
                     <span class="section-kicker">能力地图</span>
-                    <h2>四个板块，覆盖一个完整运营闭环</h2>
+                    <h2>五个板块，覆盖一个完整运营闭环</h2>
                 </div>
                 <p>每个板块都对应真实后端接口，可直接操作，不再需要手工填写英文接口参数。</p>
             </div>
             <div class="module-grid">
-                <a class="module-card module-purple" href="#copywriting">
+                <a class="module-card module-agent" href="#agent">
                     <span class="module-index">01</span>
+                    <h3>运营策略 Agent</h3>
+                    <p>自动调用利润工具，再由千问生成策略、风险提醒和行动计划。</p>
+                    <span class="module-link">进入板块 →</span>
+                </a>
+                <a class="module-card module-purple" href="#copywriting">
+                    <span class="module-index">02</span>
                     <h3>AI 商品文案</h3>
                     <p>根据商品卖点、目标用户和投放平台，生成结构化中文销售文案。</p>
                     <span class="module-link">进入板块 →</span>
                 </a>
                 <a class="module-card module-green" href="#profit">
-                    <span class="module-index">02</span>
+                    <span class="module-index">03</span>
                     <h3>单品利润测算</h3>
                     <p>计算佣金、总成本、单件利润和利润率，并给出经营建议。</p>
                     <span class="module-link">进入板块 →</span>
                 </a>
                 <a class="module-card module-orange" href="#batch">
-                    <span class="module-index">03</span>
+                    <span class="module-index">04</span>
                     <h3>Excel 批量分析</h3>
                     <p>一次处理多条商品数据，识别错误行，并可下载完整分析结果。</p>
                     <span class="module-link">进入板块 →</span>
                 </a>
                 <a class="module-card module-blue" href="#tasks">
-                    <span class="module-index">04</span>
+                    <span class="module-index">05</span>
                     <h3>任务记录管理</h3>
                     <p>把批量分析保存到本地数据库，随时查看历史任务和处理结果。</p>
                     <span class="module-link">进入板块 →</span>
@@ -117,10 +124,146 @@
             </div>
         </section>
 
+        <section class="workspace-section agent-section" id="agent">
+            <div class="section-heading">
+                <div>
+                    <span class="section-kicker">板块一 · Agent 编排</span>
+                    <h2>电商运营策略 Agent</h2>
+                </div>
+                <p>Agent 会先调用利润计算工具，再把可信结果交给千问，最终生成运营策略并展示完整执行轨迹。</p>
+            </div>
+            <div class="agent-explain">
+                <span><b>1</b>理解目标</span><i>→</i>
+                <span><b>2</b>调用利润工具</span><i>→</i>
+                <span><b>3</b>千问生成策略</span><i>→</i>
+                <span><b>4</b>校验结构化结果</span>
+            </div>
+            <div class="agent-layout">
+                <form class="form-panel agent-form" id="agent-form">
+                    <div class="panel-title">
+                        <div><span class="panel-badge agent-badge">任务</span><h3>提交经营分析任务</h3></div>
+                        <small><b>*</b> 为必填项目</small>
+                    </div>
+                    <div class="form-grid agent-form-grid">
+                        <label class="field full-field">
+                            <span>商品名称 <b>*</b></span>
+                            <input id="agent-product-name" value="无线鼠标" maxlength="100" required>
+                        </label>
+                        <label class="field full-field">
+                            <span>商品核心卖点 <b>*</b></span>
+                            <textarea id="agent-selling-points" rows="3" required>静音按键
+蓝牙双模
+轻巧便携</textarea>
+                            <small>每行一个卖点，最多填写 5 个。</small>
+                        </label>
+                        <label class="field full-field">
+                            <span>目标用户 <b>*</b></span>
+                            <input id="agent-audience" value="经常出差的职场人士" maxlength="100" required>
+                        </label>
+                        <label class="field">
+                            <span>销售价格（元）<b>*</b></span>
+                            <input id="agent-sale-price" type="number" value="79" min="0.01" step="0.01" required>
+                        </label>
+                        <label class="field">
+                            <span>采购成本（元）<b>*</b></span>
+                            <input id="agent-cost-price" type="number" value="35" min="0" step="0.01" required>
+                        </label>
+                        <label class="field">
+                            <span>单件运费（元）</span>
+                            <input id="agent-shipping-fee" type="number" value="8" min="0" step="0.01">
+                        </label>
+                        <label class="field">
+                            <span>平台佣金（百分比）</span>
+                            <input id="agent-commission-rate" type="number" value="5" min="0" max="100" step="0.01">
+                        </label>
+                        <label class="field">
+                            <span>目标平台</span>
+                            <select id="agent-platform">
+                                <option value="通用">通用</option>
+                                <option value="淘宝">淘宝</option>
+                                <option value="抖音">抖音</option>
+                                <option value="小红书" selected>小红书</option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            <span>沟通语气</span>
+                            <select id="agent-tone">
+                                <option value="专业">专业</option>
+                                <option value="亲切" selected>亲切</option>
+                                <option value="活泼">活泼</option>
+                                <option value="简洁">简洁</option>
+                            </select>
+                        </label>
+                        <label class="field full-field">
+                            <span>希望包含的关键词</span>
+                            <input id="agent-keywords" value="办公好物，便携" maxlength="100">
+                            <small>使用逗号分隔，最多 5 个。</small>
+                        </label>
+                        <label class="field full-field">
+                            <span>本次经营目标 <b>*</b></span>
+                            <textarea id="agent-business-goal" rows="2" maxlength="150" required>提高商品转化率并保持合理利润</textarea>
+                        </label>
+                    </div>
+                    <button class="submit-button agent-button" id="agent-submit" type="submit">
+                        <span>启动 Agent 分析</span><span aria-hidden="true">→</span>
+                    </button>
+                    <p class="cost-tip">Agent 会调用一次千问，请等待完整结果后再重复操作。</p>
+                </form>
+
+                <div class="agent-result-panel" aria-live="polite">
+                    <div class="panel-title agent-result-head">
+                        <div><span class="panel-badge agent-badge">结果</span><h3>运营决策报告</h3></div>
+                        <span class="result-state" id="agent-state">等待任务</span>
+                    </div>
+                    <div class="agent-empty" id="agent-empty">
+                        <div class="agent-core"><span>Agent</span></div>
+                        <h3>工具与模型尚未开始执行</h3>
+                        <p>左侧提交任务后，这里会同步展示利润工具结果、千问运营方案和每一步执行过程。</p>
+                    </div>
+                    <div class="agent-result-content hidden" id="agent-content">
+                        <div class="agent-profit-strip">
+                            <div><span>单件利润</span><b id="agent-profit"></b></div>
+                            <div><span>利润率</span><b id="agent-profit-rate"></b></div>
+                            <div class="agent-tool-judgement"><span>利润工具判断</span><b id="agent-tool-advice"></b></div>
+                        </div>
+                        <div class="agent-assessment">
+                            <span>Agent 总体判断</span>
+                            <p id="agent-assessment"></p>
+                        </div>
+                        <div class="agent-strategy-grid">
+                            <article>
+                                <span>定价与成本</span>
+                                <p id="agent-pricing"></p>
+                            </article>
+                            <article>
+                                <span>营销策略</span>
+                                <p id="agent-marketing"></p>
+                            </article>
+                            <article class="agent-risk-card">
+                                <span>风险提醒</span>
+                                <p id="agent-risk"></p>
+                            </article>
+                        </div>
+                        <div class="agent-action-box">
+                            <span>建议行动计划</span>
+                            <ol id="agent-action-list"></ol>
+                        </div>
+                        <div class="agent-trace-box">
+                            <div class="agent-trace-title">
+                                <span>Agent 执行轨迹</span>
+                                <small id="agent-meta"></small>
+                            </div>
+                            <div class="agent-trace-list" id="agent-trace-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="workspace-section" id="copywriting">
             <div class="section-heading">
                 <div>
-                    <span class="section-kicker">板块一 · AI 能力</span>
+                    <span class="section-kicker">板块二 · AI 能力</span>
                     <h2>AI 商品文案生成</h2>
                 </div>
                 <p>你负责提供真实商品信息，系统负责构建提示词、调用千问并校验返回格式。</p>
@@ -215,7 +358,7 @@
         <section class="workspace-section" id="profit">
             <div class="section-heading">
                 <div>
-                    <span class="section-kicker">板块二 · 业务工具</span>
+                    <span class="section-kicker">板块三 · 业务工具</span>
                     <h2>单品利润测算</h2>
                 </div>
                 <p>把售价、采购成本、运费和平台佣金统一纳入计算，快速判断商品是否值得销售。</p>
@@ -283,7 +426,7 @@
         <section class="workspace-section" id="batch">
             <div class="section-heading">
                 <div>
-                    <span class="section-kicker">板块三 · 自动化处理</span>
+                    <span class="section-kicker">板块四 · 自动化处理</span>
                     <h2>Excel 批量分析</h2>
                 </div>
                 <p>适合一次处理多件商品。系统逐行校验数据、计算利润，并标出无法处理的错误行。</p>
@@ -341,7 +484,7 @@
         <section class="workspace-section task-section" id="tasks">
             <div class="section-heading">
                 <div>
-                    <span class="section-kicker">板块四 · 数据持久化</span>
+                    <span class="section-kicker">板块五 · 数据持久化</span>
                     <h2>历史任务记录</h2>
                 </div>
                 <p>保存过的批量分析会写入本地 SQLite 数据库。即使重启项目，历史结果仍然存在。</p>

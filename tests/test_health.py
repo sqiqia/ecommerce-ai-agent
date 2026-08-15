@@ -13,6 +13,7 @@ def test_root() -> None:
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("text/html")
     assert "电商智营 AI 工作台" in response.text
+    assert "电商运营策略 Agent" in response.text
     assert "AI 商品文案生成" in response.text
     assert "单品利润测算" in response.text
     assert "Excel 批量分析" in response.text
@@ -39,6 +40,7 @@ def test_frontend_static_files() -> None:
     assert "--green" in css_response.text
     assert js_response.status_code == 200
     assert "/copywriting/generate" in js_response.text
+    assert "/agent/analyze" in js_response.text
 
 
 def test_health() -> None:

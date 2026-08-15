@@ -105,6 +105,82 @@ async function loadSystemInfo() {
     }
 }
 
+function renderAgentResult(result) {
+    const analysis = result.product_analysis;
+    const strategy = result.strategy;
+    byId("agent-profit").textContent = formatMoney(analysis.profit);
+    byId("agent-profit-rate").textContent = `${Number(analysis.profit_rate_percent).toFixed(2)}%`;
+    byId("agent-tool-advice").textContent = analysis.advice;
+    byId("agent-assessment").textContent = strategy.overall_assessment;
+    byId("agent-pricing").textContent = strategy.pricing_suggestion;
+    byId("agent-marketing").textContent = strategy.marketing_strategy;
+    byId("agent-risk").textContent = strategy.risk_warning;
+    byId("agent-meta").textContent = `Agent ${result.agent_version} · ${result.model}`;
+
+    const actionList = byId("agent-action-list");
+    actionList.replaceChildren(...strategy.action_plan.map((action) => {
+        const item = document.createElement("li");
+        item.textContent = action;
+        return item;
+    }));
+
+    byId("agent-trace-list").innerHTML = result.execution_trace.map((step) => `
+        <div class="agent-trace-step">
+            <span class="agent-trace-number">${escapeHtml(step.sequence)}</span>
+            <div class="agent-trace-detail">
+                <b>${escapeHtml(step.name)}</b>
+                <small>执行者：${escapeHtml(step.executor)} · 已完成</small>
+                <p>${escapeHtml(step.summary)}</p>
+            </div>
+        </div>
+    `).join("");
+
+    byId("agent-empty").classList.add("hidden");
+    byId("agent-content").classList.remove("hidden");
+}
+
+byId("agent-form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = byId("agent-submit");
+    const sellingPoints = parseList(byId("agent-selling-points").value);
+    if (!sellingPoints.length) {
+        showToast("请至少填写一个商品卖点。", "error");
+        return;
+    }
+
+    const payload = {
+        product_name: byId("agent-product-name").value.trim(),
+        selling_points: sellingPoints,
+        target_audience: byId("agent-audience").value.trim(),
+        platform: byId("agent-platform").value,
+        tone: byId("agent-tone").value,
+        keywords: parseList(byId("agent-keywords").value),
+        sale_price: Number(byId("agent-sale-price").value),
+        cost_price: Number(byId("agent-cost-price").value),
+        shipping_fee: Number(byId("agent-shipping-fee").value || 0),
+        commission_rate: Number(byId("agent-commission-rate").value || 0) / 100,
+        business_goal: byId("agent-business-goal").value.trim(),
+    };
+
+    setButtonLoading(button, true, "Agent 正在调用工具和千问…");
+    byId("agent-state").textContent = "正在执行";
+    try {
+        const result = await requestJson("/agent/analyze", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
+        renderAgentResult(result);
+        byId("agent-state").textContent = "执行完成";
+        showToast("运营 Agent 已完成分析。", "success");
+    } catch (error) {
+        byId("agent-state").textContent = "执行失败";
+        showToast(error.message, "error");
+    } finally {
+        setButtonLoading(button, false, "");
+    }
+});
+
 byId("copywriting-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     const button = byId("copy-submit");
