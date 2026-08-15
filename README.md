@@ -5,7 +5,7 @@
 ## 当前阶段
 
 - FastAPI 应用骨架
-- 首页接口：`GET /`
+- 中文可视化工作台：`GET /`
 - 健康检查：`GET /health`
 - 商品利润分析：`POST /products/analyze`
 - Excel 批量分析：`POST /products/analyze-excel`
@@ -31,7 +31,16 @@ python -m pip install -r requirements.txt
 python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-打开：<http://127.0.0.1:8000/docs>
+业务操作界面：<http://127.0.0.1:8000/>
+
+开发接口文档：<http://127.0.0.1:8000/docs>
+
+中文工作台包含四个可操作板块：
+
+1. AI 商品文案：填写商品卖点、目标用户和平台，调用大模型生成结构化文案。
+2. 单品利润测算：计算佣金、总成本、利润和利润率。
+3. Excel 批量分析：上传 `.xlsx` 表格，保存任务或下载分析结果。
+4. 任务记录管理：查看保存在 SQLite 中的历史分析任务。
 
 AI 文案模块支持兼容 Chat Completions 格式的大模型服务。真实调用前，需要在本机
 `.env` 中填写 `AI_API_KEY`、`AI_BASE_URL` 和 `AI_MODEL`。不要把真实 Key 写入

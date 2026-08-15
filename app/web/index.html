@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="集 AI 商品文案、利润测算与 Excel 批量分析于一体的电商运营工作台">
+    <title>电商智营 AI 工作台</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="/static/app.js" defer></script>
+</head>
+<body>
+    <div class="page-glow page-glow-one"></div>
+    <div class="page-glow page-glow-two"></div>
+
+    <header class="topbar">
+        <a class="brand" href="#overview" aria-label="返回首页">
+            <span class="brand-mark" aria-hidden="true">智</span>
+            <span>
+                <strong>电商智营</strong>
+                <small>AI 应用工作台</small>
+            </span>
+        </a>
+        <nav class="topnav" aria-label="主要导航">
+            <a href="#overview">项目概览</a>
+            <a href="#copywriting">AI 文案</a>
+            <a href="#profit">利润测算</a>
+            <a href="#batch">批量分析</a>
+            <a href="#tasks">任务记录</a>
+        </nav>
+        <a class="docs-link" href="/docs" target="_blank" rel="noreferrer">
+            开发接口文档
+            <span aria-hidden="true">↗</span>
+        </a>
+    </header>
+
+    <main>
+        <section class="hero" id="overview">
+            <div class="hero-copy">
+                <div class="eyebrow"><span></span> AI 应用开发作品集</div>
+                <h1>让商品数据与 AI，<br><em>真正进入运营流程。</em></h1>
+                <p>
+                    一个面向电商运营场景的中文智能工作台。输入商品信息即可生成销售文案、
+                    测算单品利润，也可以上传 Excel 完成批量分析并保存任务记录。
+                </p>
+                <div class="hero-actions">
+                    <a class="primary-action" href="#copywriting">开始生成 AI 文案</a>
+                    <a class="secondary-action" href="#modules">了解全部能力</a>
+                </div>
+                <div class="hero-meta">
+                    <span><i class="status-dot"></i><b id="hero-status">正在检查服务</b></span>
+                    <span>当前模型：<b id="hero-model">正在读取</b></span>
+                    <span>版本：<b id="hero-version">—</b></span>
+                </div>
+            </div>
+            <aside class="hero-card" aria-label="工作流程说明">
+                <div class="hero-card-head">
+                    <span>一条完整的 AI 应用链路</span>
+                    <span class="live-pill">本地运行</span>
+                </div>
+                <div class="flow-list">
+                    <div class="flow-item">
+                        <span class="flow-number">01</span>
+                        <div><b>接收业务输入</b><small>商品、成本、受众与投放平台</small></div>
+                    </div>
+                    <div class="flow-line"></div>
+                    <div class="flow-item">
+                        <span class="flow-number">02</span>
+                        <div><b>执行后端处理</b><small>参数校验、利润计算与提示词构建</small></div>
+                    </div>
+                    <div class="flow-line"></div>
+                    <div class="flow-item">
+                        <span class="flow-number">03</span>
+                        <div><b>调用大模型</b><small>千问生成结构化商品销售文案</small></div>
+                    </div>
+                    <div class="flow-line"></div>
+                    <div class="flow-item">
+                        <span class="flow-number">04</span>
+                        <div><b>沉淀分析结果</b><small>Excel 导出、SQLite 任务持久化</small></div>
+                    </div>
+                </div>
+            </aside>
+        </section>
+
+        <section class="module-overview" id="modules">
+            <div class="section-heading compact-heading">
+                <div>
+                    <span class="section-kicker">能力地图</span>
+                    <h2>四个板块，覆盖一个完整运营闭环</h2>
+                </div>
+                <p>每个板块都对应真实后端接口，可直接操作，不再需要手工填写英文接口参数。</p>
+            </div>
+            <div class="module-grid">
+                <a class="module-card module-purple" href="#copywriting">
+                    <span class="module-index">01</span>
+                    <h3>AI 商品文案</h3>
+                    <p>根据商品卖点、目标用户和投放平台，生成结构化中文销售文案。</p>
+                    <span class="module-link">进入板块 →</span>
+                </a>
+                <a class="module-card module-green" href="#profit">
+                    <span class="module-index">02</span>
+                    <h3>单品利润测算</h3>
+                    <p>计算佣金、总成本、单件利润和利润率，并给出经营建议。</p>
+                    <span class="module-link">进入板块 →</span>
+                </a>
+                <a class="module-card module-orange" href="#batch">
+                    <span class="module-index">03</span>
+                    <h3>Excel 批量分析</h3>
+                    <p>一次处理多条商品数据，识别错误行，并可下载完整分析结果。</p>
+                    <span class="module-link">进入板块 →</span>
+                </a>
+                <a class="module-card module-blue" href="#tasks">
+                    <span class="module-index">04</span>
+                    <h3>任务记录管理</h3>
+                    <p>把批量分析保存到本地数据库，随时查看历史任务和处理结果。</p>
+                    <span class="module-link">进入板块 →</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="workspace-section" id="copywriting">
+            <div class="section-heading">
+                <div>
+                    <span class="section-kicker">板块一 · AI 能力</span>
+                    <h2>AI 商品文案生成</h2>
+                </div>
+                <p>你负责提供真实商品信息，系统负责构建提示词、调用千问并校验返回格式。</p>
+            </div>
+            <div class="workspace-grid">
+                <form class="form-panel" id="copywriting-form">
+                    <div class="panel-title">
+                        <div><span class="panel-badge">输入</span><h3>填写商品资料</h3></div>
+                        <small><b>*</b> 为必填项目</small>
+                    </div>
+                    <div class="form-grid">
+                        <label class="field full-field">
+                            <span>商品名称 <b>*</b></span>
+                            <input id="copy-product-name" name="product_name" value="无线鼠标" maxlength="100" required>
+                            <small>填写用户能看懂的具体商品名称。</small>
+                        </label>
+                        <label class="field full-field">
+                            <span>核心卖点 <b>*</b></span>
+                            <textarea id="copy-selling-points" name="selling_points" rows="3" required>静音按键
+蓝牙双模
+轻巧便携</textarea>
+                            <small>每行填写一个卖点，最多 5 个。</small>
+                        </label>
+                        <label class="field full-field">
+                            <span>目标用户 <b>*</b></span>
+                            <input id="copy-audience" name="target_audience" value="经常出差的职场人士" maxlength="100" required>
+                            <small>描述最可能购买这件商品的人群。</small>
+                        </label>
+                        <label class="field">
+                            <span>投放平台</span>
+                            <select id="copy-platform" name="platform">
+                                <option value="通用">通用</option>
+                                <option value="淘宝">淘宝</option>
+                                <option value="抖音">抖音</option>
+                                <option value="小红书" selected>小红书</option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            <span>文案语气</span>
+                            <select id="copy-tone" name="tone">
+                                <option value="专业">专业</option>
+                                <option value="亲切" selected>亲切</option>
+                                <option value="活泼">活泼</option>
+                                <option value="简洁">简洁</option>
+                            </select>
+                        </label>
+                        <label class="field full-field">
+                            <span>希望包含的关键词</span>
+                            <input id="copy-keywords" name="keywords" value="办公好物，便携" maxlength="100">
+                            <small>使用逗号分隔，最多 5 个；没有可以留空。</small>
+                        </label>
+                    </div>
+                    <button class="submit-button" id="copy-submit" type="submit">
+                        <span>调用千问生成文案</span><span aria-hidden="true">→</span>
+                    </button>
+                    <p class="cost-tip">每次点击会进行一次真实模型调用，请等待结果后再重复操作。</p>
+                </form>
+
+                <div class="result-panel result-panel-dark" aria-live="polite">
+                    <div class="panel-title light-title">
+                        <div><span class="panel-badge light-badge">输出</span><h3>AI 生成结果</h3></div>
+                        <span class="result-state" id="copy-state">等待生成</span>
+                    </div>
+                    <div class="empty-result" id="copy-empty">
+                        <div class="empty-orbit"><span>AI</span></div>
+                        <h4>文案会显示在这里</h4>
+                        <p>填写左侧信息并点击生成，系统将返回标题、正文和行动引导语。</p>
+                    </div>
+                    <div class="copy-result hidden" id="copy-result">
+                        <div class="copy-block">
+                            <span>文案标题</span>
+                            <h4 id="copy-title"></h4>
+                        </div>
+                        <div class="copy-block">
+                            <span>销售正文</span>
+                            <p id="copy-body"></p>
+                        </div>
+                        <div class="copy-block cta-block">
+                            <span>行动引导</span>
+                            <p id="copy-cta"></p>
+                        </div>
+                        <div class="result-meta">
+                            <span>模型：<b id="copy-model"></b></span>
+                            <span>提示词版本：<b id="copy-version"></b></span>
+                            <button type="button" id="copy-content-button">复制全部文案</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="workspace-section" id="profit">
+            <div class="section-heading">
+                <div>
+                    <span class="section-kicker">板块二 · 业务工具</span>
+                    <h2>单品利润测算</h2>
+                </div>
+                <p>把售价、采购成本、运费和平台佣金统一纳入计算，快速判断商品是否值得销售。</p>
+            </div>
+            <div class="profit-layout">
+                <form class="form-panel profit-form" id="profit-form">
+                    <div class="panel-title">
+                        <div><span class="panel-badge green-badge">输入</span><h3>填写成本数据</h3></div>
+                    </div>
+                    <div class="form-grid">
+                        <label class="field full-field">
+                            <span>商品名称 <b>*</b></span>
+                            <input id="profit-product-name" value="无线鼠标" maxlength="100" required>
+                        </label>
+                        <label class="field">
+                            <span>销售价格（元）<b>*</b></span>
+                            <input id="sale-price" type="number" value="79" min="0.01" step="0.01" required>
+                        </label>
+                        <label class="field">
+                            <span>采购成本（元）<b>*</b></span>
+                            <input id="cost-price" type="number" value="35" min="0" step="0.01" required>
+                        </label>
+                        <label class="field">
+                            <span>单件运费（元）</span>
+                            <input id="shipping-fee" type="number" value="8" min="0" step="0.01">
+                        </label>
+                        <label class="field">
+                            <span>平台佣金（百分比）</span>
+                            <input id="commission-rate" type="number" value="5" min="0" max="100" step="0.01">
+                        </label>
+                    </div>
+                    <button class="submit-button green-button" id="profit-submit" type="submit">
+                        <span>开始测算利润</span><span aria-hidden="true">→</span>
+                    </button>
+                </form>
+                <div class="profit-result" id="profit-result" aria-live="polite">
+                    <div class="profit-placeholder" id="profit-placeholder">
+                        <span class="placeholder-chart" aria-hidden="true"></span>
+                        <h3>等待计算</h3>
+                        <p>结果会展示佣金、总成本、单件利润、利润率以及系统建议。</p>
+                    </div>
+                    <div class="hidden" id="profit-content">
+                        <div class="profit-summary">
+                            <div>
+                                <span>分析商品</span>
+                                <h3 id="profit-result-name"></h3>
+                            </div>
+                            <span class="profit-flag" id="profit-flag"></span>
+                        </div>
+                        <div class="metric-grid">
+                            <div class="metric-card"><span>平台佣金</span><b id="metric-commission"></b></div>
+                            <div class="metric-card"><span>总成本</span><b id="metric-total-cost"></b></div>
+                            <div class="metric-card highlight-metric"><span>单件利润</span><b id="metric-profit"></b></div>
+                            <div class="metric-card"><span>利润率</span><b id="metric-profit-rate"></b></div>
+                        </div>
+                        <div class="advice-box">
+                            <span>经营建议</span>
+                            <p id="profit-advice"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="workspace-section" id="batch">
+            <div class="section-heading">
+                <div>
+                    <span class="section-kicker">板块三 · 自动化处理</span>
+                    <h2>Excel 批量分析</h2>
+                </div>
+                <p>适合一次处理多件商品。系统逐行校验数据、计算利润，并标出无法处理的错误行。</p>
+            </div>
+            <div class="batch-layout">
+                <div class="upload-panel">
+                    <div class="panel-title">
+                        <div><span class="panel-badge orange-badge">上传</span><h3>选择商品表格</h3></div>
+                    </div>
+                    <label class="file-drop" for="excel-file">
+                        <input id="excel-file" type="file" accept=".xlsx">
+                        <span class="file-icon">表</span>
+                        <strong id="file-name">点击选择 Excel 文件</strong>
+                        <small id="file-description">仅支持 .xlsx 格式，文件不能超过 5MB</small>
+                    </label>
+                    <div class="template-note">
+                        <b>表格第一行必须包含：</b>
+                        <div class="column-tags">
+                            <span>商品名称</span><span>售价</span><span>成本</span><span>运费</span><span>佣金率</span>
+                        </div>
+                        <p>佣金率可填写小数，例如 5% 填写为 0.05。</p>
+                    </div>
+                    <div class="batch-actions">
+                        <button class="submit-button orange-button" id="save-task-button" type="button">分析并保存任务</button>
+                        <button class="outline-button" id="export-button" type="button">分析并下载结果</button>
+                    </div>
+                </div>
+                <div class="batch-result-panel" id="batch-result-panel" aria-live="polite">
+                    <div class="batch-empty" id="batch-empty">
+                        <span>等待上传</span>
+                        <h3>批量结果将在这里汇总</h3>
+                        <p>建议先使用“分析并保存任务”，结果会进入下方任务记录。</p>
+                    </div>
+                    <div class="hidden" id="batch-content">
+                        <div class="batch-title-row">
+                            <div><span>本次处理文件</span><h3 id="batch-filename"></h3></div>
+                            <span class="task-id-badge" id="batch-task-id"></span>
+                        </div>
+                        <div class="batch-stats">
+                            <div><span>总行数</span><b id="batch-total"></b></div>
+                            <div class="success-stat"><span>成功</span><b id="batch-success"></b></div>
+                            <div class="error-stat"><span>失败</span><b id="batch-error"></b></div>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>行号</th><th>商品</th><th>状态</th><th>利润</th><th>说明</th></tr></thead>
+                                <tbody id="batch-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="workspace-section task-section" id="tasks">
+            <div class="section-heading">
+                <div>
+                    <span class="section-kicker">板块四 · 数据持久化</span>
+                    <h2>历史任务记录</h2>
+                </div>
+                <p>保存过的批量分析会写入本地 SQLite 数据库。即使重启项目，历史结果仍然存在。</p>
+            </div>
+            <div class="task-toolbar">
+                <div><span class="status-dot"></span> 共找到 <b id="task-total">0</b> 个任务</div>
+                <button class="outline-button small-button" id="refresh-tasks" type="button">刷新记录</button>
+            </div>
+            <div class="task-list" id="task-list">
+                <div class="task-loading">正在读取任务记录…</div>
+            </div>
+        </section>
+
+        <section class="system-section">
+            <div>
+                <span class="section-kicker">系统状态</span>
+                <h2>后端服务与开发入口</h2>
+                <p>业务操作请使用本页面；查看接口定义、请求结构和状态码时，再进入开发接口文档。</p>
+            </div>
+            <div class="system-cards">
+                <div class="system-card">
+                    <span class="system-icon">服</span>
+                    <div><small>后端服务</small><b id="footer-status">正在检查</b></div>
+                </div>
+                <div class="system-card">
+                    <span class="system-icon">模</span>
+                    <div><small>大模型</small><b id="footer-model">正在读取</b></div>
+                </div>
+                <a class="system-card system-link-card" href="/docs" target="_blank" rel="noreferrer">
+                    <span class="system-icon">接</span>
+                    <div><small>开发者入口</small><b>打开接口文档 ↗</b></div>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="brand footer-brand">
+            <span class="brand-mark" aria-hidden="true">智</span>
+            <span><strong>电商智营</strong><small>AI 应用开发练习项目</small></span>
+        </div>
+        <p>FastAPI · 千问大模型 · SQLite · Excel 自动化</p>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
