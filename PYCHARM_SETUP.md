@@ -36,28 +36,28 @@ app/core/config.py          从 .env 读取集中配置
 .env                        本机真实配置，不应提交或分享
 .env.example                可公开的配置字段示例
 requirements.txt            项目所需 Python 包
+run_server.py               自动选择空闲端口并启动后端服务
 tests/test_health.py        首页、健康检查和文档测试
 pytest.ini                  pytest 的项目路径设置
 ```
 
 Python Package 目录中的 `__init__.py` 用来告诉 Python：这个目录可以作为包导入。普通数据目录 `data` 和 `logs` 不需要它。
 
-## 4. 建立 PyCharm 运行配置
+## 4. 建立 PyCharm 一键运行配置
 
-1. 打开 `Run -> Edit Configurations`。
-2. 点击左上角 `+`，选择 `Python`。
-3. 名称填写 `Ecommerce Agent API`。
-4. 运行目标选择 `Module name`。
-5. Module name 填写 `uvicorn`。
-6. Parameters 填写：
+推荐使用项目根目录的 `run_server.py`，无需手动填写 Uvicorn 参数：
 
-   ```text
-   app.main:app --reload --host 127.0.0.1 --port 8000
-   ```
+1. 在左侧项目栏找到 `run_server.py`。
+2. 右键点击它，选择“运行 `run_server`”。
+3. PyCharm 会自动建立运行配置，以后点击右上角绿色三角形即可启动。
+4. 启动器会检查 8000、8001、8002 等端口，自动使用第一个空闲端口。
+5. 以运行窗口打印的“中文工作台”地址为准，不要固定猜测端口。
 
-7. Working directory 选择包含 `app` 和 `requirements.txt` 的项目根目录。
-8. Python interpreter 选择本项目 `.venv` 中的 `python.exe`。
-9. 点击 `Apply -> OK`。
+也可以在 PyCharm 底部“终端”运行：
+
+```powershell
+python run_server.py
+```
 
 `app.main:app` 分成三部分理解：
 
@@ -67,29 +67,23 @@ Python Package 目录中的 `__init__.py` 用来告诉 Python：这个目录可�
 
 ## 5. 启动和停止
 
-在 PyCharm 右上角选择 `Ecommerce Agent API`，点击绿色三角形。正常输出应包含：
+运行 `run_server.py` 后，正常输出应包含：
 
 ```text
-Uvicorn running on http://127.0.0.1:8000
+中文工作台：http://127.0.0.1:实际端口
 Application startup complete
-```
-
-也可以直接在 PyCharm Terminal 中启动：
-
-```powershell
-python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 停止时点击 Run 窗口的红色方块，或者在 Terminal 中按 `Ctrl+C`。
 
 ## 6. 浏览器验收
 
-服务保持运行时依次访问：
+服务保持运行时，按照运行窗口打印的端口依次访问。假设启动器选择了 8002：
 
 ```text
-http://127.0.0.1:8000/
-http://127.0.0.1:8000/health
-http://127.0.0.1:8000/docs
+http://127.0.0.1:8002/
+http://127.0.0.1:8002/health
+http://127.0.0.1:8002/docs
 ```
 
 验收结果：
@@ -129,7 +123,7 @@ python -m pip install -r requirements.txt
 
 ### `Address already in use`
 
-8000 端口已被占用。先停止旧服务，或者把运行参数中的端口改成 `8001`，再访问 `http://127.0.0.1:8001/docs`。
+直接运行 `python run_server.py`。启动器会跳过被占用或残留的端口，并打印新的访问地址。
 
 ### 页面无法访问
 

@@ -5,6 +5,7 @@
 ## 当前阶段
 
 - FastAPI 应用骨架
+- PyCharm 一键启动器：自动避开被占用的本地端口
 - 中文可视化工作台：`GET /`
 - 健康检查：`GET /health`
 - 商品利润分析：`POST /products/analyze`
@@ -33,14 +34,27 @@ python scripts/inspect_database.py
 
 ## 本地运行
 
+推荐直接运行启动器，它会从 8000 开始自动寻找空闲端口：
+
 ```powershell
 python -m pip install -r requirements.txt
-python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+python run_server.py
 ```
 
-业务操作界面：<http://127.0.0.1:8000/>
+终端会打印实际访问地址。例如 8000、8001 被占用时，会自动切换到 8002：
 
-开发接口文档：<http://127.0.0.1:8000/docs>
+```text
+端口 8000 已被占用，已自动切换到 8002。
+中文工作台：http://127.0.0.1:8002
+健康检查：http://127.0.0.1:8002/health
+接口文档：http://127.0.0.1:8002/docs
+```
+
+需要指定起始端口时使用：
+
+```powershell
+python run_server.py --port 8010
+```
 
 中文工作台包含五个可操作板块：
 
