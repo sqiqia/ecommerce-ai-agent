@@ -1,0 +1,28 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ecommerce-ai-agent:local
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: sqlite:////app/data/ecommerce.db
+    ports:
+      - "${APP_HOST_PORT:-8080}:8000"
+    volumes:
+      - ecommerce_data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  ecommerce_data:

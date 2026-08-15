@@ -30,8 +30,9 @@ app/services/                   利润、Prompt、AI 客户端、Agent 编排和
 app/repositories/               SQLAlchemy 数据访问
 app/models/                     SQLite 表模型
 app/web/                        中文网页、样式和交互逻辑
-tests/                          接口、数据库、服务和启动器测试
+tests/                          接口、数据库、服务、启动器和容器配置测试
 run_server.py                   自动检测空闲端口的一键启动器
+Dockerfile、compose.yaml        容器镜像、健康检查与 SQLite 数据卷
 ```
 
 回答代码分层问题时，可以说：路由层只处理 HTTP，业务逻辑进入 service，数据库读写进入 repository，数据结构集中放在 schema 和 model 中。
@@ -92,7 +93,7 @@ Windows 上被异常结束的本地服务留下了端口占用，导致 Uvicorn 
 
 ## 五、简历项目描述参考
 
-不要把没有完成的 Docker、Redis、RAG 或微服务写进简历。可以根据实际掌握程度使用下面内容：
+不要把尚未完成的 Redis、RAG、微服务或公网部署写进简历。Docker 配置只有在本机完成真实构建后，才能描述为“完成容器化验证”。可以根据实际掌握程度使用下面内容：
 
 ### 项目名称
 
@@ -109,8 +110,9 @@ Windows 上被异常结束的本地服务留下了端口占用，导致 Uvicorn 
 - 封装兼容 Chat Completions 的千问客户端，使用 `.env` 管理密钥和模型配置，避免敏感信息进入 Git；
 - 使用 SQLAlchemy 与 SQLite 保存批量任务、Agent 请求结果、执行轨迹和用户反馈，支持历史详情回放；
 - 使用 openpyxl 实现 Excel 逐行校验、利润批量分析和结果导出；
-- 编写 37 项 pytest 自动化测试，通过模拟 AI 客户端和临时数据库降低测试成本并保证可重复性；
+- 编写 40 项 pytest 自动化测试，通过模拟 AI 客户端和临时数据库降低测试成本并保证可重复性；
 - 针对 Windows 本地端口残留问题实现自动端口探测启动器，提高 PyCharm 演示稳定性。
+- 编写非 root Docker 镜像、健康检查和 Compose 数据卷配置，并隔离本地密钥与数据库文件；
 
 ## 六、现场演示顺序
 

@@ -2,7 +2,7 @@
 
 这是一个基于 FastAPI、千问大模型和 SQLite 的中文电商运营 AI 应用。它不是只调用一次模型 API 的演示，而是覆盖了业务输入、工具计算、Prompt 构建、结构化输出、风险检查、历史持久化和用户反馈的完整应用链路。
 
-> 项目定位：AI 应用开发求职作品集。当前版本专注本地可运行、代码可解释和流程可验证，不依赖 Docker、Redis、云服务器等额外平台。
+> 项目定位：AI 应用开发求职作品集。当前版本专注代码可解释和流程可验证，既支持 PyCharm 本地运行，也提供 Docker 容器配置；Redis、RAG 和服务拆分将按可验证阶段逐步加入。
 
 ## 项目解决什么问题
 
@@ -49,6 +49,7 @@ flowchart LR
 | 前端 | HTML、CSS、JavaScript | 无额外前端框架的中文操作界面 |
 | 测试 | pytest、FastAPI TestClient | 接口、服务、数据库和启动器自动化测试 |
 | 工程化 | Git、GitHub、`.env` | 版本管理、公开展示和密钥隔离 |
+| 容器化 | Docker、Compose | 非 root 镜像、健康检查和 SQLite 数据卷 |
 
 ## 值得在面试中讲的设计
 
@@ -116,6 +117,32 @@ python run_server.py
 python run_server.py --port 8010
 ```
 
+## Docker 运行
+
+本机安装 Docker Desktop 后，在项目根目录执行：
+
+```powershell
+# 首次克隆项目时创建本机配置；已有 .env 不要重复执行这一行
+Copy-Item .env.example .env
+docker compose up --build
+```
+
+默认访问地址：
+
+```text
+中文工作台：http://127.0.0.1:8080
+健康检查：http://127.0.0.1:8080/health
+接口文档：http://127.0.0.1:8080/docs
+```
+
+选择 8080 是为了避开本机开发中常见的 8000、8001 端口占用。需要修改宿主机端口时，在 `.env` 中添加：
+
+```text
+APP_HOST_PORT=8090
+```
+
+Compose 使用具名卷 `ecommerce_data` 保存 SQLite 数据，因此正常重建容器不会删除历史记录。真实 `.env` 只在运行时注入，`.dockerignore` 会阻止它进入镜像。镜像使用 `requirements-prod.txt`，不会安装 pytest 等开发测试工具。
+
 中文工作台包含五个可操作板块：
 
 1. 电商运营 Agent：自动调用利润工具，再由大模型生成运营策略、风险提醒和行动计划。
@@ -134,7 +161,7 @@ AI 文案模块支持兼容 Chat Completions 格式的大模型服务。真实�
 python -m pytest -q
 ```
 
-当前完整测试数量：`37`。测试中的模型响应均为本地模拟数据，不会消耗千问额度。
+当前完整测试数量：`40`。测试中的模型响应均为本地模拟数据，不会消耗千问额度。
 
 ## 当前边界
 
