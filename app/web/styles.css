@@ -290,6 +290,25 @@ main { width: min(1180px, 90vw); margin: 0 auto; }
 .agent-profit-strip span { color: #8eab9b; font-size: 9px; }
 .agent-profit-strip b { margin-top: 5px; font-size: 17px; }
 .agent-tool-judgement b { color: #b4e2c8; font-size: 11px; line-height: 1.5; }
+.agent-quality-card { display: grid; grid-template-columns: 125px 1fr; gap: 14px; padding: 17px; border: 1px solid rgba(117,206,160,.18); border-radius: 14px; background: rgba(41,102,72,.15); }
+.agent-quality-score { display: flex; flex-direction: column; justify-content: center; padding: 14px; border-radius: 12px; background: #f1f8f4; color: var(--ink); text-align: center; }
+.agent-quality-score > span { color: #648071; font-size: 8px; font-weight: 800; }
+.agent-quality-score strong { margin: 7px 0 3px; color: var(--green); }
+.agent-quality-score strong b { font-size: 32px; }
+.agent-quality-score strong small { margin-left: 2px; color: #82978b; font-size: 8px; }
+.agent-quality-score em { color: #357656; font-size: 9px; font-style: normal; font-weight: 800; }
+.agent-quality-score em.quality-failed { color: var(--danger); }
+.agent-quality-title { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.agent-quality-title span, .agent-quality-suggestions > span { color: #9bcbb2; font-size: 9px; font-weight: 800; }
+.agent-quality-title small { color: #789484; font-size: 8px; }
+.agent-quality-criteria { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.agent-quality-row > div:first-child { display: flex; justify-content: space-between; gap: 8px; font-size: 8px; }
+.agent-quality-row > div:first-child b { color: #b9e2cc; }
+.agent-quality-bar { height: 4px; margin: 5px 0; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.1); }
+.agent-quality-bar i { display: block; height: 100%; border-radius: inherit; background: #68c18f; }
+.agent-quality-row small { display: block; color: #819c8d; font-size: 7px; line-height: 1.45; }
+.agent-quality-suggestions { grid-column: span 2; padding-top: 11px; border-top: 1px solid rgba(255,255,255,.08); }
+.agent-quality-suggestions ul { margin: 7px 0 0; padding-left: 16px; color: #bbd2c5; font-size: 8px; line-height: 1.6; }
 .agent-assessment { padding: 18px; border: 1px solid rgba(93,190,139,.19); border-radius: 14px; background: rgba(74,168,119,.09); }
 .agent-assessment span, .agent-strategy-grid span, .agent-action-box > span { color: #8fc2a7; font-size: 9px; font-weight: 800; }
 .agent-assessment p, .agent-strategy-grid p { margin: 7px 0 0; color: #dcebe3; font-size: 12px; line-height: 1.75; }
@@ -326,7 +345,7 @@ main { width: min(1180px, 90vw); margin: 0 auto; }
 .agent-history-tools b { color: var(--green); }
 .agent-history-list { display: grid; gap: 10px; }
 .agent-history-empty { padding: 38px; border: 1px dashed #cbd9d0; border-radius: 15px; color: var(--muted); background: white; text-align: center; font-size: 11px; }
-.agent-history-card { display: grid; grid-template-columns: 48px minmax(220px, 1fr) 90px 80px 86px; align-items: center; gap: 13px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 15px; background: white; transition: .18s ease; }
+.agent-history-card { display: grid; grid-template-columns: 48px minmax(200px, 1fr) 82px 75px 95px 86px; align-items: center; gap: 13px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 15px; background: white; transition: .18s ease; }
 .agent-history-card:hover { border-color: #b7cdbf; box-shadow: 0 10px 28px rgba(24,54,39,.05); }
 .agent-history-number { color: var(--green); font-size: 13px; font-weight: 900; }
 .agent-history-main { min-width: 0; }
@@ -335,6 +354,9 @@ main { width: min(1180px, 90vw); margin: 0 auto; }
 .agent-history-main p { margin: 0; overflow: hidden; color: #647269; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
 .agent-history-metric span, .agent-history-metric b { display: block; }
 .agent-history-metric b { margin-top: 4px; font-size: 12px; }
+.agent-history-quality span, .agent-history-quality b { display: block; }
+.agent-history-quality span { color: var(--muted); font-size: 8px; }
+.agent-history-quality b { margin-top: 4px; color: var(--green); font-size: 10px; }
 .agent-history-view { min-height: 34px; border: 1px solid #cfe0d5; border-radius: 9px; color: var(--green); background: var(--green-soft); cursor: pointer; font-size: 10px; font-weight: 800; }
 .agent-history-view:hover { color: white; background: var(--green); }
 
@@ -454,7 +476,7 @@ footer p { font-size: 11px; }
     .module-grid { grid-template-columns: repeat(2, 1fr); }
     .task-card { grid-template-columns: 60px minmax(140px, 1fr) repeat(2, 70px) 105px 90px; }
     .task-card .task-errors { display: none; }
-    .agent-history-card { grid-template-columns: 48px minmax(170px, 1fr) 80px 86px; }
+    .agent-history-card { grid-template-columns: 48px minmax(170px, 1fr) 80px 95px 86px; }
     .agent-history-card .agent-history-metric:nth-of-type(4) { display: none; }
     .system-section { grid-template-columns: 1fr; }
 }
@@ -475,7 +497,7 @@ footer p { font-size: 11px; }
     .task-card { grid-template-columns: 50px minmax(120px, 1fr) 55px 82px; }
     .task-card .task-success, .task-card .task-errors, .task-card .task-time { display: none; }
     .system-cards { grid-template-columns: 1fr; }
-    .agent-history-card { grid-template-columns: 42px minmax(150px, 1fr) 82px; }
+    .agent-history-card { grid-template-columns: 42px minmax(150px, 1fr) 95px 82px; }
     .agent-history-card .agent-history-metric { display: none; }
 }
 
@@ -499,6 +521,10 @@ footer p { font-size: 11px; }
     .agent-history-tools { justify-content: space-between; margin-top: 14px; }
     .agent-history-card { grid-template-columns: 38px 1fr; }
     .agent-history-view { grid-column: span 2; }
+    .agent-history-quality { display: none; }
+    .agent-quality-card { grid-template-columns: 1fr; }
+    .agent-quality-suggestions { grid-column: auto; }
+    .agent-quality-criteria { grid-template-columns: 1fr; }
     .system-section { padding: 28px; }
     footer { display: block; }
     footer p { margin-top: 18px; }

@@ -42,6 +42,7 @@ def test_frontend_static_files() -> None:
     assert "/copywriting/generate" in js_response.text
     assert "/agent/analyze" in js_response.text
     assert "/agent/runs" in js_response.text
+    assert "quality_evaluation" in js_response.text
 
 
 def test_health() -> None:

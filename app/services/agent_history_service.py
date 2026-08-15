@@ -12,6 +12,7 @@ from app.schemas.agent import (
     AgentRunDetailResponse,
     AgentRunSummaryResponse,
 )
+from app.services.agent_evaluation_service import ensure_agent_evaluation
 
 
 def save_agent_run(
@@ -35,6 +36,9 @@ def save_agent_run(
 
 
 def to_agent_run_summary(run: AgentRun) -> AgentRunSummaryResponse:
+    request = AgentAnalyzeRequest.model_validate_json(run.request_json)
+    result = AgentAnalyzeResponse.model_validate_json(run.result_json)
+    evaluation = ensure_agent_evaluation(request, result)
     return AgentRunSummaryResponse(
         id=run.id,
         product_name=run.product_name,
@@ -43,6 +47,8 @@ def to_agent_run_summary(run: AgentRun) -> AgentRunSummaryResponse:
         profit=run.profit,
         profit_rate_percent=run.profit_rate_percent,
         overall_assessment=run.overall_assessment,
+        quality_score=evaluation.overall_score,
+        quality_grade=evaluation.grade,
         created_at=run.created_at,
     )
 
@@ -50,6 +56,7 @@ def to_agent_run_summary(run: AgentRun) -> AgentRunSummaryResponse:
 def to_agent_run_detail(run: AgentRun) -> AgentRunDetailResponse:
     request = AgentAnalyzeRequest.model_validate_json(run.request_json)
     result = AgentAnalyzeResponse.model_validate_json(run.result_json)
+    ensure_agent_evaluation(request, result)
     result.run_id = run.id
     return AgentRunDetailResponse(
         **to_agent_run_summary(run).model_dump(),

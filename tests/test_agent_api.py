@@ -102,17 +102,52 @@ def test_agent_calls_tools_and_persists_replayable_history(client: TestClient) -
         "pydantic_validator",
     ]
     assert all(step["status"] == "completed" for step in body["execution_trace"])
+    assert body["quality_evaluation"]["overall_score"] == 96
+    assert body["quality_evaluation"]["grade"] == "优秀"
+    assert body["quality_evaluation"]["passed"] is True
+    assert body["quality_evaluation"]["evaluator"] == "rule_based_v1"
+    assert len(body["quality_evaluation"]["criteria"]) == 4
 
     listing = client.get("/agent/runs")
     assert listing.status_code == 200
     assert listing.json()["total"] == 1
     assert listing.json()["items"][0]["product_name"] == "无线鼠标"
+    assert listing.json()["items"][0]["quality_score"] == 96
+    assert listing.json()["items"][0]["quality_grade"] == "优秀"
 
     detail = client.get("/agent/runs/1")
     assert detail.status_code == 200
     assert detail.json()["request"] == make_request_body()
     assert detail.json()["result"] == body
     assert "api_key" not in str(detail.json()).lower()
+
+
+def test_agent_quality_gate_flags_risky_claims(client: TestClient) -> None:
+    class RiskyAIClient:
+        model = "fake-agent-model"
+
+        def generate_structured(self, *_):
+            return GeneratedOperationStrategy(
+                overall_assessment="商品保证成为销量第一。",
+                pricing_suggestion="保持当前价格并测试优惠券。",
+                marketing_strategy="突出静音、双模和便携卖点。",
+                risk_warning="发布前仍然需要核对全部商品参数。",
+                action_plan=["制作场景内容", "测试两版标题", "复盘转化数据"],
+            )
+
+    app.dependency_overrides[get_ai_client] = RiskyAIClient
+    try:
+        response = client.post("/agent/analyze", json=make_request_body())
+    finally:
+        app.dependency_overrides.pop(get_ai_client, None)
+
+    assert response.status_code == 200
+    evaluation = response.json()["quality_evaluation"]
+    assert evaluation["overall_score"] == 88
+    assert evaluation["grade"] == "良好"
+    assert evaluation["passed"] is True
+    assert any("删除绝对化承诺" in suggestion for suggestion in evaluation["suggestions"])
+    assert "保证" in evaluation["criteria"][3]["explanation"]
 
 
 def test_agent_history_returns_latest_run_first(client: TestClient) -> None:

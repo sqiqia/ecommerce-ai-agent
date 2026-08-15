@@ -118,6 +118,23 @@ function renderAgentResult(result) {
     const runLabel = result.run_id ? ` · 记录 #${result.run_id}` : "";
     byId("agent-meta").textContent = `Agent ${result.agent_version} · ${result.model}${runLabel}`;
 
+    const evaluation = result.quality_evaluation;
+    if (evaluation) {
+        byId("agent-quality-score").textContent = evaluation.overall_score;
+        byId("agent-quality-grade").textContent = `${evaluation.grade} · ${evaluation.passed ? "已通过" : "需复核"}`;
+        byId("agent-quality-grade").classList.toggle("quality-failed", !evaluation.passed);
+        byId("agent-quality-criteria").innerHTML = evaluation.criteria.map((criterion) => `
+            <div class="agent-quality-row">
+                <div><span>${escapeHtml(criterion.name)}</span><b>${escapeHtml(criterion.score)} / ${escapeHtml(criterion.max_score)}</b></div>
+                <div class="agent-quality-bar"><i style="width: ${Number(criterion.score) / Number(criterion.max_score) * 100}%"></i></div>
+                <small>${escapeHtml(criterion.explanation)}</small>
+            </div>
+        `).join("");
+        byId("agent-quality-suggestions").innerHTML = evaluation.suggestions
+            .map((suggestion) => `<li>${escapeHtml(suggestion)}</li>`)
+            .join("");
+    }
+
     const actionList = byId("agent-action-list");
     actionList.replaceChildren(...strategy.action_plan.map((action) => {
         const item = document.createElement("li");
@@ -209,6 +226,10 @@ function renderAgentHistory(items) {
             <div class="agent-history-metric">
                 <span>利润率</span>
                 <b>${escapeHtml(Number(item.profit_rate_percent).toFixed(2))}%</b>
+            </div>
+            <div class="agent-history-quality">
+                <span>质量评分</span>
+                <b>${escapeHtml(item.quality_score)} 分 · ${escapeHtml(item.quality_grade)}</b>
             </div>
             <button class="agent-history-view" type="button" data-agent-run-id="${escapeHtml(item.id)}">
                 查看详情
