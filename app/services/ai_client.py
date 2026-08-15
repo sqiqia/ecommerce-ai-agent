@@ -1,9 +1,20 @@
 import json
+from typing import Protocol, TypeVar
 
 import httpx
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 
 from app.schemas.copywriting import GeneratedCopywriting, CopywritingPromptResponse
+
+
+class ChatPrompt(Protocol):
+    """大模型提示词对象需要提供的最小字段集合。"""
+
+    system_prompt: str
+    user_prompt: str
+
+
+StructuredResponse = TypeVar("StructuredResponse", bound=BaseModel)
 
 
 class AIClientError(Exception):
@@ -43,6 +54,15 @@ class AIChatClient:
     def generate(self, prompt: CopywritingPromptResponse) -> GeneratedCopywriting:
         """发送 Prompt，并把大模型响应转换成结构化文案。"""
 
+        return self.generate_structured(prompt, GeneratedCopywriting)
+
+    def generate_structured(
+        self,
+        prompt: ChatPrompt,
+        response_model: type[StructuredResponse],
+    ) -> StructuredResponse:
+        """发送 Prompt，并把 JSON 响应校验成指定的 Pydantic 模型。"""
+
         self._validate_configuration()
         request_body = {
             "model": self.model,
@@ -68,7 +88,7 @@ class AIChatClient:
         if not isinstance(content, str) or not content.strip():
             raise AIResponseError("大模型返回的文案内容为空")
 
-        return self._parse_copywriting(content)
+        return self._parse_structured(content, response_model)
 
     def _validate_configuration(self) -> None:
         missing_fields = [
@@ -102,7 +122,10 @@ class AIChatClient:
             raise AIProviderError("无法连接大模型服务") from exc
 
     @staticmethod
-    def _parse_copywriting(content: str) -> GeneratedCopywriting:
+    def _parse_structured(
+        content: str,
+        response_model: type[StructuredResponse],
+    ) -> StructuredResponse:
         cleaned_content = content.strip()
         if cleaned_content.startswith("```"):
             lines = cleaned_content.splitlines()
@@ -113,6 +136,6 @@ class AIChatClient:
 
         try:
             data = json.loads(cleaned_content)
-            return GeneratedCopywriting.model_validate(data)
+            return response_model.model_validate(data)
         except (json.JSONDecodeError, ValidationError, TypeError) as exc:
-            raise AIResponseError("大模型返回的文案不是约定的 JSON 格式") from exc
+            raise AIResponseError("大模型返回的内容不是约定的 JSON 格式") from exc

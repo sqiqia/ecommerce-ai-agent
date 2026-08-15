@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 
 class Settings(BaseSettings):
     app_name: str = "电商运营自动化 Agent"
-    app_version: str = "0.2.0"
+    app_version: str = "0.3.0"
     debug: bool = True
     database_url: str = f"sqlite:///{BASE_DIR / 'data' / 'ecommerce.db'}"
     ai_api_key: str = ""

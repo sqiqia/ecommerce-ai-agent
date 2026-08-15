@@ -15,6 +15,7 @@
 - 任务详情：`GET /tasks/{task_id}`
 - AI 文案 Prompt 预览：`POST /copywriting/prompt-preview`
 - AI 商品文案生成：`POST /copywriting/generate`
+- 电商运营 Agent：`POST /agent/analyze`，自动调用利润工具并生成运营策略与执行轨迹
 
 查看本地 SQLite 数据库概要：
 
