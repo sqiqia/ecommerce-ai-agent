@@ -317,6 +317,26 @@ main { width: min(1180px, 90vw); margin: 0 auto; }
 .agent-trace-detail b { font-size: 11px; }
 .agent-trace-detail small { color: #7f9a8b; font-size: 8px; }
 .agent-trace-detail p { margin: 4px 0 0; color: #abc0b5; font-size: 9px; line-height: 1.55; }
+.agent-history-panel { margin-top: 22px; padding: 26px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: #f6f9f7; }
+.agent-history-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
+.agent-history-heading > div:first-child { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 7px 10px; }
+.agent-history-heading h3 { margin: 0; font-size: 18px; }
+.agent-history-heading p { grid-column: span 2; max-width: 650px; margin: 3px 0 0; color: var(--muted); font-size: 11px; line-height: 1.7; }
+.agent-history-tools { display: flex; align-items: center; gap: 12px; flex-shrink: 0; color: var(--muted); font-size: 10px; }
+.agent-history-tools b { color: var(--green); }
+.agent-history-list { display: grid; gap: 10px; }
+.agent-history-empty { padding: 38px; border: 1px dashed #cbd9d0; border-radius: 15px; color: var(--muted); background: white; text-align: center; font-size: 11px; }
+.agent-history-card { display: grid; grid-template-columns: 48px minmax(220px, 1fr) 90px 80px 86px; align-items: center; gap: 13px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 15px; background: white; transition: .18s ease; }
+.agent-history-card:hover { border-color: #b7cdbf; box-shadow: 0 10px 28px rgba(24,54,39,.05); }
+.agent-history-number { color: var(--green); font-size: 13px; font-weight: 900; }
+.agent-history-main { min-width: 0; }
+.agent-history-main span, .agent-history-metric span { color: var(--muted); font-size: 8px; }
+.agent-history-main h4 { margin: 4px 0 2px; font-size: 13px; }
+.agent-history-main p { margin: 0; overflow: hidden; color: #647269; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.agent-history-metric span, .agent-history-metric b { display: block; }
+.agent-history-metric b { margin-top: 4px; font-size: 12px; }
+.agent-history-view { min-height: 34px; border: 1px solid #cfe0d5; border-radius: 9px; color: var(--green); background: var(--green-soft); cursor: pointer; font-size: 10px; font-weight: 800; }
+.agent-history-view:hover { color: white; background: var(--green); }
 
 .result-panel-dark { min-height: 650px; color: #f5fbf7; border-color: #203a30; background: #152920; box-shadow: 0 24px 60px rgba(18,44,32,.16); }
 .light-title { border-bottom: 1px solid rgba(255,255,255,.11); padding-bottom: 20px; }
@@ -434,6 +454,8 @@ footer p { font-size: 11px; }
     .module-grid { grid-template-columns: repeat(2, 1fr); }
     .task-card { grid-template-columns: 60px minmax(140px, 1fr) repeat(2, 70px) 105px 90px; }
     .task-card .task-errors { display: none; }
+    .agent-history-card { grid-template-columns: 48px minmax(170px, 1fr) 80px 86px; }
+    .agent-history-card .agent-history-metric:nth-of-type(4) { display: none; }
     .system-section { grid-template-columns: 1fr; }
 }
 
@@ -453,6 +475,8 @@ footer p { font-size: 11px; }
     .task-card { grid-template-columns: 50px minmax(120px, 1fr) 55px 82px; }
     .task-card .task-success, .task-card .task-errors, .task-card .task-time { display: none; }
     .system-cards { grid-template-columns: 1fr; }
+    .agent-history-card { grid-template-columns: 42px minmax(150px, 1fr) 82px; }
+    .agent-history-card .agent-history-metric { display: none; }
 }
 
 @media (max-width: 520px) {
@@ -470,6 +494,11 @@ footer p { font-size: 11px; }
     .agent-profit-strip { grid-template-columns: repeat(2, 1fr); }
     .agent-tool-judgement { grid-column: span 2; }
     .agent-strategy-grid article:nth-child(2) { grid-column: auto; }
+    .agent-history-panel { padding: 20px; }
+    .agent-history-heading { display: block; }
+    .agent-history-tools { justify-content: space-between; margin-top: 14px; }
+    .agent-history-card { grid-template-columns: 38px 1fr; }
+    .agent-history-view { grid-column: span 2; }
     .system-section { padding: 28px; }
     footer { display: block; }
     footer p { margin-top: 18px; }

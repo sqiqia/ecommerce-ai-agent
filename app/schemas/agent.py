@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -76,7 +77,35 @@ class AgentAnalyzeResponse(BaseModel):
     """Agent 最终返回的分析、策略与执行轨迹。"""
 
     agent_version: str
+    run_id: int | None = None
     model: str
     product_analysis: ProductAnalyzeResponse
     strategy: GeneratedOperationStrategy
     execution_trace: list[AgentExecutionStep]
+
+
+class AgentRunSummaryResponse(BaseModel):
+    """Agent 历史记录列表中的摘要。"""
+
+    id: int
+    product_name: str
+    business_goal: str
+    model: str
+    profit: float
+    profit_rate_percent: float
+    overall_assessment: str
+    created_at: datetime
+
+
+class AgentRunDetailResponse(AgentRunSummaryResponse):
+    """可用于完整回放的一次 Agent 运行记录。"""
+
+    request: AgentAnalyzeRequest
+    result: AgentAnalyzeResponse
+
+
+class AgentRunListResponse(BaseModel):
+    """支持分页的 Agent 历史记录列表。"""
+
+    total: int
+    items: list[AgentRunSummaryResponse]

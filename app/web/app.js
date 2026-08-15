@@ -115,7 +115,8 @@ function renderAgentResult(result) {
     byId("agent-pricing").textContent = strategy.pricing_suggestion;
     byId("agent-marketing").textContent = strategy.marketing_strategy;
     byId("agent-risk").textContent = strategy.risk_warning;
-    byId("agent-meta").textContent = `Agent ${result.agent_version} · ${result.model}`;
+    const runLabel = result.run_id ? ` · 记录 #${result.run_id}` : "";
+    byId("agent-meta").textContent = `Agent ${result.agent_version} · ${result.model}${runLabel}`;
 
     const actionList = byId("agent-action-list");
     actionList.replaceChildren(...strategy.action_plan.map((action) => {
@@ -172,6 +173,7 @@ byId("agent-form").addEventListener("submit", async (event) => {
         });
         renderAgentResult(result);
         byId("agent-state").textContent = "执行完成";
+        await loadAgentHistory();
         showToast("运营 Agent 已完成分析。", "success");
     } catch (error) {
         byId("agent-state").textContent = "执行失败";
@@ -180,6 +182,89 @@ byId("agent-form").addEventListener("submit", async (event) => {
         setButtonLoading(button, false, "");
     }
 });
+
+function renderAgentHistory(items) {
+    const historyList = byId("agent-history-list");
+    if (!items.length) {
+        historyList.innerHTML = `
+            <div class="agent-history-empty">
+                还没有成功记录。完成一次 Agent 分析后，结果会自动出现在这里。
+            </div>
+        `;
+        return;
+    }
+
+    historyList.innerHTML = items.map((item) => `
+        <article class="agent-history-card">
+            <div class="agent-history-number">#${escapeHtml(item.id)}</div>
+            <div class="agent-history-main">
+                <span>${escapeHtml(formatDate(item.created_at))} · ${escapeHtml(item.model)}</span>
+                <h4>${escapeHtml(item.product_name)}</h4>
+                <p>${escapeHtml(item.business_goal)}</p>
+            </div>
+            <div class="agent-history-metric">
+                <span>单件利润</span>
+                <b>${escapeHtml(formatMoney(item.profit))}</b>
+            </div>
+            <div class="agent-history-metric">
+                <span>利润率</span>
+                <b>${escapeHtml(Number(item.profit_rate_percent).toFixed(2))}%</b>
+            </div>
+            <button class="agent-history-view" type="button" data-agent-run-id="${escapeHtml(item.id)}">
+                查看详情
+            </button>
+        </article>
+    `).join("");
+
+    historyList.querySelectorAll("[data-agent-run-id]").forEach((button) => {
+        button.addEventListener("click", () => loadAgentRunDetail(button.dataset.agentRunId));
+    });
+}
+
+async function loadAgentHistory() {
+    const refreshButton = byId("refresh-agent-history");
+    setButtonLoading(refreshButton, true, "正在刷新…");
+    try {
+        const result = await requestJson("/agent/runs?offset=0&limit=20");
+        byId("agent-history-total").textContent = result.total;
+        renderAgentHistory(result.items);
+    } catch (error) {
+        byId("agent-history-list").innerHTML = `
+            <div class="agent-history-empty">${escapeHtml(error.message)}</div>
+        `;
+    } finally {
+        setButtonLoading(refreshButton, false, "");
+    }
+}
+
+function restoreAgentForm(request) {
+    byId("agent-product-name").value = request.product_name;
+    byId("agent-selling-points").value = request.selling_points.join("\n");
+    byId("agent-audience").value = request.target_audience;
+    byId("agent-sale-price").value = request.sale_price;
+    byId("agent-cost-price").value = request.cost_price;
+    byId("agent-shipping-fee").value = request.shipping_fee;
+    byId("agent-commission-rate").value = Number(request.commission_rate) * 100;
+    byId("agent-platform").value = request.platform;
+    byId("agent-tone").value = request.tone;
+    byId("agent-keywords").value = request.keywords.join("，");
+    byId("agent-business-goal").value = request.business_goal;
+}
+
+async function loadAgentRunDetail(runId) {
+    try {
+        const detail = await requestJson(`/agent/runs/${runId}`);
+        restoreAgentForm(detail.request);
+        renderAgentResult(detail.result);
+        byId("agent-state").textContent = `正在回放记录 #${runId}`;
+        byId("agent").scrollIntoView({ behavior: "smooth", block: "start" });
+        showToast(`已加载 Agent 记录 #${runId}。`, "success");
+    } catch (error) {
+        showToast(error.message, "error");
+    }
+}
+
+byId("refresh-agent-history").addEventListener("click", loadAgentHistory);
 
 byId("copywriting-form").addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -428,4 +513,5 @@ async function loadTaskDetail(taskId) {
 byId("refresh-tasks").addEventListener("click", loadTasks);
 
 loadSystemInfo();
+loadAgentHistory();
 loadTasks();

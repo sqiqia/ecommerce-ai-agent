@@ -1,5 +1,5 @@
 from app.database.connection import Base, engine
-from app.models import product_result, task  # noqa: F401
+from app.models import agent_run, product_result, task  # noqa: F401
 
 
 def init_db() -> None:

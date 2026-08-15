@@ -258,6 +258,22 @@
                     </div>
                 </div>
             </div>
+            <div class="agent-history-panel">
+                <div class="agent-history-heading">
+                    <div>
+                        <span class="panel-badge agent-badge">历史</span>
+                        <h3>Agent 分析历史</h3>
+                        <p>每次成功分析都会自动保存。点击“查看详情”可回放报告，并把原始输入重新填入左侧表单。</p>
+                    </div>
+                    <div class="agent-history-tools">
+                        <span>共 <b id="agent-history-total">0</b> 条</span>
+                        <button class="small-button" id="refresh-agent-history" type="button">刷新记录</button>
+                    </div>
+                </div>
+                <div class="agent-history-list" id="agent-history-list">
+                    <div class="agent-history-empty">正在读取 Agent 历史记录…</div>
+                </div>
+            </div>
         </section>
 
         <section class="workspace-section" id="copywriting">
