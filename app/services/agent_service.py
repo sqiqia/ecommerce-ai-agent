@@ -5,7 +5,7 @@ from app.schemas.agent import (
     GeneratedOperationStrategy,
 )
 from app.schemas.product import ProductAnalyzeRequest
-from app.services.agent_evaluation_service import evaluate_agent_result
+from app.services.agent_guardrail_service import inspect_agent_result
 from app.services.agent_prompt_service import build_agent_prompt
 from app.services.ai_client import AIChatClient
 from app.services.product_service import analyze_product
@@ -71,5 +71,5 @@ def run_ecommerce_agent(
         strategy=strategy,
         execution_trace=execution_trace,
     )
-    response.quality_evaluation = evaluate_agent_result(request, response)
+    response.guardrail = inspect_agent_result(response)
     return response

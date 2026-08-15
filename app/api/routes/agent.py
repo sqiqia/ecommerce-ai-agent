@@ -1,3 +1,5 @@
+from time import perf_counter
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
@@ -6,9 +8,13 @@ from app.database.connection import get_db
 from app.schemas.agent import (
     AgentAnalyzeRequest,
     AgentAnalyzeResponse,
+    AgentFeedbackRequest,
+    AgentFeedbackResponse,
     AgentRunDetailResponse,
     AgentRunListResponse,
+    AgentRuntimeMetrics,
 )
+from app.services.agent_feedback_service import save_agent_feedback
 from app.services.agent_history_service import (
     query_agent_run_detail,
     query_agent_runs,
@@ -43,6 +49,7 @@ def analyze_with_agent(
 ) -> AgentAnalyzeResponse:
     """执行利润工具与大模型编排，并返回完整执行轨迹。"""
 
+    started_at = perf_counter()
     try:
         result = run_ecommerce_agent(request, ai_client)
     except AIConfigurationError as exc:
@@ -56,6 +63,10 @@ def analyze_with_agent(
             detail=str(exc),
         ) from exc
 
+    result.runtime_metrics = AgentRuntimeMetrics(
+        duration_ms=round((perf_counter() - started_at) * 1000),
+        model_call_count=1,
+    )
     saved_run = save_agent_run(database, request, result)
     result.run_id = saved_run.id
     return result
@@ -74,8 +85,26 @@ def list_agent_run_history(
     total, runs = query_agent_runs(database, offset=offset, limit=limit)
     return AgentRunListResponse(
         total=total,
-        items=[to_agent_run_summary(run) for run in runs],
+        items=[to_agent_run_summary(database, run) for run in runs],
     )
+
+
+@router.post(
+    "/runs/{run_id}/feedback",
+    response_model=AgentFeedbackResponse,
+    summary="保存用户对 Agent 结果的反馈",
+)
+def submit_agent_run_feedback(
+    run_id: int,
+    request: AgentFeedbackRequest,
+    database: Session = Depends(get_db),
+) -> AgentFeedbackResponse:
+    if query_agent_run_detail(database, run_id) is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Agent 运行记录不存在",
+        )
+    return save_agent_feedback(database, run_id, request)
 
 
 @router.get(
@@ -93,4 +122,4 @@ def get_agent_run_history(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Agent 运行记录不存在",
         )
-    return to_agent_run_detail(run)
+    return to_agent_run_detail(database, run)

@@ -17,7 +17,9 @@
 - AI 商品文案生成：`POST /copywriting/generate`
 - 电商运营 Agent：`POST /agent/analyze`，自动调用利润工具并生成运营策略与执行轨迹
 - Agent 历史记录：`GET /agent/runs`、`GET /agent/runs/{run_id}`
-- Agent 质量门禁：从输入完整度、业务依据、行动可执行性和风险格式四个维度进行 100 分制评估，不产生额外模型费用
+- Agent 内容风险检查：标记绝对化或无法直接核验的表述，提醒人工复核，不增加模型调用
+- Agent 运行信息：记录成功工作流的耗时与模型调用次数
+- Agent 真实反馈：`POST /agent/runs/{run_id}/feedback`，保存“有帮助/需要改进”和文字意见
 
 网页端的“Agent 分析历史”会自动列出最近 20 次成功运行；点击“查看详情”可回放完整报告并恢复当时的表单输入。失败的模型调用不会写入历史记录。
 

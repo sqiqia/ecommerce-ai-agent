@@ -12,7 +12,8 @@ from app.schemas.agent import (
     AgentRunDetailResponse,
     AgentRunSummaryResponse,
 )
-from app.services.agent_evaluation_service import ensure_agent_evaluation
+from app.services.agent_feedback_service import query_agent_feedback
+from app.services.agent_guardrail_service import ensure_agent_guardrail
 
 
 def save_agent_run(
@@ -35,10 +36,9 @@ def save_agent_run(
     return add_agent_run(database, run)
 
 
-def to_agent_run_summary(run: AgentRun) -> AgentRunSummaryResponse:
-    request = AgentAnalyzeRequest.model_validate_json(run.request_json)
+def to_agent_run_summary(database: Session, run: AgentRun) -> AgentRunSummaryResponse:
     result = AgentAnalyzeResponse.model_validate_json(run.result_json)
-    evaluation = ensure_agent_evaluation(request, result)
+    guardrail = ensure_agent_guardrail(result)
     return AgentRunSummaryResponse(
         id=run.id,
         product_name=run.product_name,
@@ -47,19 +47,21 @@ def to_agent_run_summary(run: AgentRun) -> AgentRunSummaryResponse:
         profit=run.profit,
         profit_rate_percent=run.profit_rate_percent,
         overall_assessment=run.overall_assessment,
-        quality_score=evaluation.overall_score,
-        quality_grade=evaluation.grade,
+        duration_ms=(result.runtime_metrics.duration_ms if result.runtime_metrics else None),
+        model_call_count=(result.runtime_metrics.model_call_count if result.runtime_metrics else 1),
+        guardrail_status=guardrail.status,
+        feedback=query_agent_feedback(database, run.id),
         created_at=run.created_at,
     )
 
 
-def to_agent_run_detail(run: AgentRun) -> AgentRunDetailResponse:
+def to_agent_run_detail(database: Session, run: AgentRun) -> AgentRunDetailResponse:
     request = AgentAnalyzeRequest.model_validate_json(run.request_json)
     result = AgentAnalyzeResponse.model_validate_json(run.result_json)
-    ensure_agent_evaluation(request, result)
+    ensure_agent_guardrail(result)
     result.run_id = run.id
     return AgentRunDetailResponse(
-        **to_agent_run_summary(run).model_dump(),
+        **to_agent_run_summary(database, run).model_dump(),
         request=request,
         result=result,
     )

@@ -73,24 +73,19 @@ class AgentExecutionStep(BaseModel):
     summary: str
 
 
-class AgentQualityCriterion(BaseModel):
-    """一次确定性质量检查的评分项。"""
+class AgentGuardrailResult(BaseModel):
+    """针对高风险营销表述的实际检查结果。"""
 
-    name: str
-    score: int = Field(ge=0)
-    max_score: int = Field(gt=0)
-    explanation: str
+    status: Literal["passed", "needs_review"]
+    matched_phrases: list[str]
+    message: str
 
 
-class AgentQualityEvaluation(BaseModel):
-    """Agent 结果的基础质量门禁报告。"""
+class AgentRuntimeMetrics(BaseModel):
+    """一次成功工作流的运行信息。"""
 
-    overall_score: int = Field(ge=0, le=100)
-    grade: Literal["优秀", "良好", "合格", "需要优化"]
-    passed: bool
-    criteria: list[AgentQualityCriterion]
-    suggestions: list[str]
-    evaluator: str
+    duration_ms: int = Field(ge=0)
+    model_call_count: int = Field(ge=0)
 
 
 class AgentAnalyzeResponse(BaseModel):
@@ -102,7 +97,24 @@ class AgentAnalyzeResponse(BaseModel):
     product_analysis: ProductAnalyzeResponse
     strategy: GeneratedOperationStrategy
     execution_trace: list[AgentExecutionStep]
-    quality_evaluation: AgentQualityEvaluation | None = None
+    guardrail: AgentGuardrailResult | None = None
+    runtime_metrics: AgentRuntimeMetrics | None = None
+
+
+class AgentFeedbackRequest(BaseModel):
+    """用户对 Agent 结果的真实反馈。"""
+
+    rating: Literal["useful", "needs_improvement"]
+    comment: str = Field(default="", max_length=300)
+
+
+class AgentFeedbackResponse(BaseModel):
+    """已保存的用户反馈。"""
+
+    run_id: int
+    rating: Literal["useful", "needs_improvement"]
+    comment: str
+    created_at: datetime
 
 
 class AgentRunSummaryResponse(BaseModel):
@@ -115,8 +127,10 @@ class AgentRunSummaryResponse(BaseModel):
     profit: float
     profit_rate_percent: float
     overall_assessment: str
-    quality_score: int
-    quality_grade: str
+    duration_ms: int | None
+    model_call_count: int
+    guardrail_status: Literal["passed", "needs_review"]
+    feedback: AgentFeedbackResponse | None
     created_at: datetime
 
 

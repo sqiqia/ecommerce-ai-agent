@@ -3,6 +3,8 @@ const byId = (id) => document.getElementById(id);
 const state = {
     selectedFile: null,
     toastTimer: null,
+    activeAgentRunId: null,
+    selectedFeedbackRating: null,
 };
 
 function showToast(message, type = "success") {
@@ -105,7 +107,18 @@ async function loadSystemInfo() {
     }
 }
 
-function renderAgentResult(result) {
+function applyFeedbackState(feedback = null) {
+    state.selectedFeedbackRating = feedback?.rating || null;
+    document.querySelectorAll("[data-feedback-rating]").forEach((button) => {
+        button.classList.toggle("selected", button.dataset.feedbackRating === state.selectedFeedbackRating);
+    });
+    byId("agent-feedback-comment").value = feedback?.comment || "";
+    byId("agent-feedback-status").textContent = feedback
+        ? `已保存：${feedback.rating === "useful" ? "有帮助" : "需要改进"}`
+        : "尚未提交反馈";
+}
+
+function renderAgentResult(result, feedback = null) {
     const analysis = result.product_analysis;
     const strategy = result.strategy;
     byId("agent-profit").textContent = formatMoney(analysis.profit);
@@ -118,22 +131,23 @@ function renderAgentResult(result) {
     const runLabel = result.run_id ? ` · 记录 #${result.run_id}` : "";
     byId("agent-meta").textContent = `Agent ${result.agent_version} · ${result.model}${runLabel}`;
 
-    const evaluation = result.quality_evaluation;
-    if (evaluation) {
-        byId("agent-quality-score").textContent = evaluation.overall_score;
-        byId("agent-quality-grade").textContent = `${evaluation.grade} · ${evaluation.passed ? "已通过" : "需复核"}`;
-        byId("agent-quality-grade").classList.toggle("quality-failed", !evaluation.passed);
-        byId("agent-quality-criteria").innerHTML = evaluation.criteria.map((criterion) => `
-            <div class="agent-quality-row">
-                <div><span>${escapeHtml(criterion.name)}</span><b>${escapeHtml(criterion.score)} / ${escapeHtml(criterion.max_score)}</b></div>
-                <div class="agent-quality-bar"><i style="width: ${Number(criterion.score) / Number(criterion.max_score) * 100}%"></i></div>
-                <small>${escapeHtml(criterion.explanation)}</small>
-            </div>
-        `).join("");
-        byId("agent-quality-suggestions").innerHTML = evaluation.suggestions
-            .map((suggestion) => `<li>${escapeHtml(suggestion)}</li>`)
-            .join("");
-    }
+    const runtime = result.runtime_metrics;
+    byId("agent-duration").textContent = runtime ? `${runtime.duration_ms} 毫秒` : "旧记录未统计";
+    byId("agent-call-count").textContent = runtime ? `${runtime.model_call_count} 次` : "1 次";
+
+    const guardrail = result.guardrail || {status: "passed", matched_phrases: [], message: "未发现预设高风险表述。"};
+    const needsReview = guardrail.status === "needs_review";
+    byId("agent-guardrail").classList.toggle("needs-review", needsReview);
+    byId("agent-guardrail-status").textContent = needsReview ? "需要人工复核" : "检查通过";
+    byId("agent-guardrail-message").textContent = guardrail.message;
+    byId("agent-guardrail-phrases").textContent = needsReview
+        ? `命中表述：${guardrail.matched_phrases.join("、")}`
+        : "";
+    byId("agent-guardrail-phrases").classList.toggle("hidden", !needsReview);
+
+    state.activeAgentRunId = result.run_id || null;
+    byId("agent-feedback-box").classList.toggle("hidden", !state.activeAgentRunId);
+    applyFeedbackState(feedback);
 
     const actionList = byId("agent-action-list");
     actionList.replaceChildren(...strategy.action_plan.map((action) => {
@@ -227,9 +241,10 @@ function renderAgentHistory(items) {
                 <span>利润率</span>
                 <b>${escapeHtml(Number(item.profit_rate_percent).toFixed(2))}%</b>
             </div>
-            <div class="agent-history-quality">
-                <span>质量评分</span>
-                <b>${escapeHtml(item.quality_score)} 分 · ${escapeHtml(item.quality_grade)}</b>
+            <div class="agent-history-observe">
+                <span>${item.duration_ms === null ? "旧记录未统计" : `${escapeHtml(item.duration_ms)} 毫秒`} · ${escapeHtml(item.model_call_count)} 次调用</span>
+                <b class="${item.guardrail_status === "needs_review" ? "review" : ""}">${item.guardrail_status === "needs_review" ? "需人工复核" : "风险检查通过"}</b>
+                <small>${item.feedback ? `反馈：${item.feedback.rating === "useful" ? "有帮助" : "需要改进"}` : "尚未反馈"}</small>
             </div>
             <button class="agent-history-view" type="button" data-agent-run-id="${escapeHtml(item.id)}">
                 查看详情
@@ -276,7 +291,7 @@ async function loadAgentRunDetail(runId) {
     try {
         const detail = await requestJson(`/agent/runs/${runId}`);
         restoreAgentForm(detail.request);
-        renderAgentResult(detail.result);
+        renderAgentResult(detail.result, detail.feedback);
         byId("agent-state").textContent = `正在回放记录 #${runId}`;
         byId("agent").scrollIntoView({ behavior: "smooth", block: "start" });
         showToast(`已加载 Agent 记录 #${runId}。`, "success");
@@ -286,6 +301,45 @@ async function loadAgentRunDetail(runId) {
 }
 
 byId("refresh-agent-history").addEventListener("click", loadAgentHistory);
+
+document.querySelectorAll("[data-feedback-rating]").forEach((button) => {
+    button.addEventListener("click", () => {
+        state.selectedFeedbackRating = button.dataset.feedbackRating;
+        document.querySelectorAll("[data-feedback-rating]").forEach((item) => {
+            item.classList.toggle("selected", item === button);
+        });
+    });
+});
+
+byId("agent-feedback-submit").addEventListener("click", async () => {
+    if (!state.activeAgentRunId) {
+        showToast("请先完成或打开一条 Agent 分析记录。", "error");
+        return;
+    }
+    if (!state.selectedFeedbackRating) {
+        showToast("请先选择“有帮助”或“需要改进”。", "error");
+        return;
+    }
+    const button = byId("agent-feedback-submit");
+    setButtonLoading(button, true, "正在保存…");
+    try {
+        const feedback = await requestJson(`/agent/runs/${state.activeAgentRunId}/feedback`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                rating: state.selectedFeedbackRating,
+                comment: byId("agent-feedback-comment").value.trim(),
+            }),
+        });
+        applyFeedbackState(feedback);
+        await loadAgentHistory();
+        showToast("真实反馈已保存。", "success");
+    } catch (error) {
+        showToast(error.message, "error");
+    } finally {
+        setButtonLoading(button, false, "");
+    }
+});
 
 byId("copywriting-form").addEventListener("submit", async (event) => {
     event.preventDefault();

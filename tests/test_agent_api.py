@@ -102,18 +102,18 @@ def test_agent_calls_tools_and_persists_replayable_history(client: TestClient) -
         "pydantic_validator",
     ]
     assert all(step["status"] == "completed" for step in body["execution_trace"])
-    assert body["quality_evaluation"]["overall_score"] == 96
-    assert body["quality_evaluation"]["grade"] == "优秀"
-    assert body["quality_evaluation"]["passed"] is True
-    assert body["quality_evaluation"]["evaluator"] == "rule_based_v1"
-    assert len(body["quality_evaluation"]["criteria"]) == 4
+    assert body["guardrail"]["status"] == "passed"
+    assert body["guardrail"]["matched_phrases"] == []
+    assert body["runtime_metrics"]["duration_ms"] >= 0
+    assert body["runtime_metrics"]["model_call_count"] == 1
 
     listing = client.get("/agent/runs")
     assert listing.status_code == 200
     assert listing.json()["total"] == 1
     assert listing.json()["items"][0]["product_name"] == "无线鼠标"
-    assert listing.json()["items"][0]["quality_score"] == 96
-    assert listing.json()["items"][0]["quality_grade"] == "优秀"
+    assert listing.json()["items"][0]["guardrail_status"] == "passed"
+    assert listing.json()["items"][0]["model_call_count"] == 1
+    assert listing.json()["items"][0]["feedback"] is None
 
     detail = client.get("/agent/runs/1")
     assert detail.status_code == 200
@@ -121,8 +121,18 @@ def test_agent_calls_tools_and_persists_replayable_history(client: TestClient) -
     assert detail.json()["result"] == body
     assert "api_key" not in str(detail.json()).lower()
 
+    feedback = client.post(
+        "/agent/runs/1/feedback",
+        json={"rating": "useful", "comment": "利润和行动建议都很清楚"},
+    )
+    assert feedback.status_code == 200
+    assert feedback.json()["rating"] == "useful"
+    assert feedback.json()["comment"] == "利润和行动建议都很清楚"
+    assert client.get("/agent/runs").json()["items"][0]["feedback"]["rating"] == "useful"
+    assert client.get("/agent/runs/1").json()["feedback"]["comment"] == "利润和行动建议都很清楚"
 
-def test_agent_quality_gate_flags_risky_claims(client: TestClient) -> None:
+
+def test_agent_guardrail_flags_risky_claims(client: TestClient) -> None:
     class RiskyAIClient:
         model = "fake-agent-model"
 
@@ -142,12 +152,10 @@ def test_agent_quality_gate_flags_risky_claims(client: TestClient) -> None:
         app.dependency_overrides.pop(get_ai_client, None)
 
     assert response.status_code == 200
-    evaluation = response.json()["quality_evaluation"]
-    assert evaluation["overall_score"] == 88
-    assert evaluation["grade"] == "良好"
-    assert evaluation["passed"] is True
-    assert any("删除绝对化承诺" in suggestion for suggestion in evaluation["suggestions"])
-    assert "保证" in evaluation["criteria"][3]["explanation"]
+    guardrail = response.json()["guardrail"]
+    assert guardrail["status"] == "needs_review"
+    assert guardrail["matched_phrases"] == ["保证", "销量第一"]
+    assert "人工修改" in guardrail["message"]
 
 
 def test_agent_history_returns_latest_run_first(client: TestClient) -> None:
@@ -173,6 +181,11 @@ def test_agent_history_reports_unknown_run(client: TestClient) -> None:
 
     assert response.status_code == 404
     assert response.json()["detail"] == "Agent 运行记录不存在"
+    feedback_response = client.post(
+        "/agent/runs/999/feedback",
+        json={"rating": "useful", "comment": ""},
+    )
+    assert feedback_response.status_code == 404
 
 
 def test_agent_rejects_invalid_financial_data(client: TestClient) -> None:

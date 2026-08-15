@@ -226,22 +226,19 @@
                             <div><span>利润率</span><b id="agent-profit-rate"></b></div>
                             <div class="agent-tool-judgement"><span>利润工具判断</span><b id="agent-tool-advice"></b></div>
                         </div>
-                        <div class="agent-quality-card">
-                            <div class="agent-quality-score">
-                                <span>基础质量评分</span>
-                                <strong><b id="agent-quality-score"></b><small>/ 100</small></strong>
-                                <em id="agent-quality-grade"></em>
+                        <div class="agent-observability-card">
+                            <div class="agent-runtime-grid">
+                                <div><span>工作流耗时</span><b id="agent-duration"></b></div>
+                                <div><span>模型调用</span><b id="agent-call-count"></b></div>
+                                <div><span>执行状态</span><b>成功</b></div>
                             </div>
-                            <div class="agent-quality-detail">
-                                <div class="agent-quality-title">
-                                    <span>质量门禁明细</span>
-                                    <small>规则评分，不额外调用千问</small>
+                            <div class="agent-guardrail" id="agent-guardrail">
+                                <div>
+                                    <span>内容风险检查</span>
+                                    <b id="agent-guardrail-status"></b>
                                 </div>
-                                <div class="agent-quality-criteria" id="agent-quality-criteria"></div>
-                            </div>
-                            <div class="agent-quality-suggestions">
-                                <span>改进建议</span>
-                                <ul id="agent-quality-suggestions"></ul>
+                                <p id="agent-guardrail-message"></p>
+                                <small class="hidden" id="agent-guardrail-phrases"></small>
                             </div>
                         </div>
                         <div class="agent-assessment">
@@ -272,6 +269,21 @@
                                 <small id="agent-meta"></small>
                             </div>
                             <div class="agent-trace-list" id="agent-trace-list"></div>
+                        </div>
+                        <div class="agent-feedback-box hidden" id="agent-feedback-box">
+                            <div>
+                                <span>这个结果对你有帮助吗？</span>
+                                <small>真实反馈比自动评分更有价值，会保存到本地数据库。</small>
+                            </div>
+                            <div class="agent-feedback-actions">
+                                <button type="button" data-feedback-rating="useful">有帮助</button>
+                                <button type="button" data-feedback-rating="needs_improvement">需要改进</button>
+                            </div>
+                            <textarea id="agent-feedback-comment" rows="2" maxlength="300" placeholder="可选：写下哪里有用，或具体需要改进什么"></textarea>
+                            <div class="agent-feedback-submit-row">
+                                <small id="agent-feedback-status">尚未提交反馈</small>
+                                <button type="button" id="agent-feedback-submit">保存反馈</button>
+                            </div>
                         </div>
                     </div>
                 </div>
