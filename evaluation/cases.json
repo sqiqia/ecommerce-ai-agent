@@ -1,0 +1,402 @@
+[
+  {
+    "case_id": "CASE-001",
+    "category": "数码办公",
+    "scenario": "面向经常出差的职场人士推广便携无线鼠标。",
+    "expected_profit_band": "healthy",
+    "review_focus": ["是否突出差旅办公场景", "是否避免编造续航和销量"],
+    "request": {
+      "product_name": "无线鼠标",
+      "selling_points": ["静音按键", "蓝牙双模", "轻巧便携"],
+      "target_audience": "经常出差的职场人士",
+      "platform": "小红书",
+      "tone": "亲切",
+      "keywords": ["办公好物", "便携"],
+      "sale_price": 79,
+      "cost_price": 35,
+      "shipping_fee": 8,
+      "commission_rate": 0.05,
+      "business_goal": "保持利润的同时提高商品吸引力"
+    }
+  },
+  {
+    "case_id": "CASE-002",
+    "category": "居家日用",
+    "scenario": "为通勤人群制作保温杯淘宝运营方案。",
+    "expected_profit_band": "healthy",
+    "review_focus": ["是否结合通勤使用场景", "是否没有虚构保温时长"],
+    "request": {
+      "product_name": "便携保温杯",
+      "selling_points": ["一键开盖", "杯身轻巧", "可拆洗杯盖"],
+      "target_audience": "通勤上班族",
+      "platform": "淘宝",
+      "tone": "简洁",
+      "keywords": ["通勤", "易清洗"],
+      "sale_price": 59,
+      "cost_price": 22,
+      "shipping_fee": 6,
+      "commission_rate": 0.05,
+      "business_goal": "突出使用便利性并保持当前定价"
+    }
+  },
+  {
+    "case_id": "CASE-003",
+    "category": "箱包",
+    "scenario": "在抖音推广容量清晰、适合短途出行的双肩包。",
+    "expected_profit_band": "healthy",
+    "review_focus": ["是否适配短视频内容", "是否给出具体内容动作"],
+    "request": {
+      "product_name": "轻量双肩包",
+      "selling_points": ["多分区收纳", "独立电脑夹层", "轻量背负"],
+      "target_audience": "学生和短途出行用户",
+      "platform": "抖音",
+      "tone": "活泼",
+      "keywords": ["大容量", "通勤背包"],
+      "sale_price": 129,
+      "cost_price": 68,
+      "shipping_fee": 10,
+      "commission_rate": 0.05,
+      "business_goal": "通过场景展示提高点击和咨询"
+    }
+  },
+  {
+    "case_id": "CASE-004",
+    "category": "家居电器",
+    "scenario": "为租房书桌场景设计台灯运营建议。",
+    "expected_profit_band": "healthy",
+    "review_focus": ["是否围绕书桌空间", "是否避免医疗护眼承诺"],
+    "request": {
+      "product_name": "折叠阅读台灯",
+      "selling_points": ["三档亮度", "折叠收纳", "触控操作"],
+      "target_audience": "学生和租房上班族",
+      "platform": "小红书",
+      "tone": "亲切",
+      "keywords": ["书桌好物", "小户型"],
+      "sale_price": 89,
+      "cost_price": 48,
+      "shipping_fee": 8,
+      "commission_rate": 0.05,
+      "business_goal": "强调小空间使用价值"
+    }
+  },
+  {
+    "case_id": "CASE-005",
+    "category": "手机配件",
+    "scenario": "分析低利润手机支架是否适合继续促销。",
+    "expected_profit_band": "low",
+    "review_focus": ["是否明确提示利润偏低", "是否先考虑成本和价格"],
+    "request": {
+      "product_name": "桌面手机支架",
+      "selling_points": ["角度可调", "折叠便携", "底部防滑"],
+      "target_audience": "需要桌面追剧或视频会议的用户",
+      "platform": "淘宝",
+      "tone": "简洁",
+      "keywords": ["桌面支架", "折叠"],
+      "sale_price": 29.9,
+      "cost_price": 21,
+      "shipping_fee": 5,
+      "commission_rate": 0.05,
+      "business_goal": "判断是否适合继续降价促销"
+    }
+  },
+  {
+    "case_id": "CASE-006",
+    "category": "手机配件",
+    "scenario": "识别一款低价数据线当前定价会导致亏损。",
+    "expected_profit_band": "loss",
+    "review_focus": ["是否把亏损放在首要位置", "是否避免只给流量建议"],
+    "request": {
+      "product_name": "编织数据线",
+      "selling_points": ["编织线身", "加固接口", "一米长度"],
+      "target_audience": "日常手机充电用户",
+      "platform": "通用",
+      "tone": "专业",
+      "keywords": ["耐用", "充电线"],
+      "sale_price": 19.9,
+      "cost_price": 15,
+      "shipping_fee": 5,
+      "commission_rate": 0.05,
+      "business_goal": "在避免亏损的前提下调整经营方案"
+    }
+  },
+  {
+    "case_id": "CASE-007",
+    "category": "雨具",
+    "scenario": "为城市通勤用户设计折叠伞营销方案。",
+    "expected_profit_band": "medium",
+    "review_focus": ["是否体现通勤场景", "是否没有虚构抗风等级"],
+    "request": {
+      "product_name": "便携折叠伞",
+      "selling_points": ["折叠体积小", "一键开收", "伞套收纳"],
+      "target_audience": "城市通勤用户",
+      "platform": "小红书",
+      "tone": "亲切",
+      "keywords": ["通勤必备", "便携雨伞"],
+      "sale_price": 49,
+      "cost_price": 26,
+      "shipping_fee": 7,
+      "commission_rate": 0.05,
+      "business_goal": "通过雨天通勤场景提高收藏"
+    }
+  },
+  {
+    "case_id": "CASE-008",
+    "category": "运动用品",
+    "scenario": "面向居家初学者推广入门瑜伽垫。",
+    "expected_profit_band": "medium",
+    "review_focus": ["是否适合运动初学者", "是否避免减肥和治疗承诺"],
+    "request": {
+      "product_name": "入门瑜伽垫",
+      "selling_points": ["双面纹理", "附带绑带", "适合居家铺放"],
+      "target_audience": "居家运动初学者",
+      "platform": "抖音",
+      "tone": "活泼",
+      "keywords": ["居家运动", "新手友好"],
+      "sale_price": 99,
+      "cost_price": 55,
+      "shipping_fee": 10,
+      "commission_rate": 0.05,
+      "business_goal": "降低新手购买决策难度"
+    }
+  },
+  {
+    "case_id": "CASE-009",
+    "category": "收纳用品",
+    "scenario": "用前后对比内容推广桌面收纳盒。",
+    "expected_profit_band": "healthy",
+    "review_focus": ["是否给出前后对比内容思路", "是否围绕宿舍和办公桌"],
+    "request": {
+      "product_name": "桌面收纳盒",
+      "selling_points": ["分格设计", "透明抽屉", "可叠放"],
+      "target_audience": "学生和办公桌杂物较多的用户",
+      "platform": "小红书",
+      "tone": "亲切",
+      "keywords": ["桌面整理", "收纳"],
+      "sale_price": 39.9,
+      "cost_price": 18,
+      "shipping_fee": 6,
+      "commission_rate": 0.05,
+      "business_goal": "制作直观的整理前后对比内容"
+    }
+  },
+  {
+    "case_id": "CASE-010",
+    "category": "数码音频",
+    "scenario": "为通勤用户制作蓝牙耳机卖点顺序。",
+    "expected_profit_band": "healthy",
+    "review_focus": ["是否先讲通勤痛点", "是否避免虚构音质参数和续航"],
+    "request": {
+      "product_name": "入耳式蓝牙耳机",
+      "selling_points": ["双设备切换", "触控操作", "充电盒便携"],
+      "target_audience": "通勤和移动办公用户",
+      "platform": "淘宝",
+      "tone": "专业",
+      "keywords": ["蓝牙耳机", "通勤"],
+      "sale_price": 159,
+      "cost_price": 95,
+      "shipping_fee": 8,
+      "commission_rate": 0.05,
+      "business_goal": "优化详情页卖点顺序"
+    }
+  },
+  {
+    "case_id": "CASE-011",
+    "category": "宠物用品",
+    "scenario": "展示宠物梳毛工具的实际操作过程。",
+    "expected_profit_band": "healthy",
+    "review_focus": ["是否强调实际操作演示", "是否避免保证宠物接受"],
+    "request": {
+      "product_name": "宠物浮毛梳",
+      "selling_points": ["一键清毛", "圆头梳齿", "手柄防滑"],
+      "target_audience": "养猫和小型犬的家庭",
+      "platform": "抖音",
+      "tone": "活泼",
+      "keywords": ["养宠好物", "清理浮毛"],
+      "sale_price": 45,
+      "cost_price": 20,
+      "shipping_fee": 6,
+      "commission_rate": 0.05,
+      "business_goal": "通过真实操作展示降低理解成本"
+    }
+  },
+  {
+    "case_id": "CASE-012",
+    "category": "厨房用品",
+    "scenario": "为烘焙新手说明厨房电子秤的基础用途。",
+    "expected_profit_band": "medium",
+    "review_focus": ["是否围绕烘焙新手", "是否避免虚构精度和认证"],
+    "request": {
+      "product_name": "厨房电子秤",
+      "selling_points": ["去皮功能", "单位切换", "屏幕读数清晰"],
+      "target_audience": "烘焙和轻食制作新手",
+      "platform": "小红书",
+      "tone": "专业",
+      "keywords": ["烘焙工具", "厨房秤"],
+      "sale_price": 69,
+      "cost_price": 38,
+      "shipping_fee": 7,
+      "commission_rate": 0.05,
+      "business_goal": "解释产品用途并减少参数理解门槛"
+    }
+  },
+  {
+    "case_id": "CASE-013",
+    "category": "个护用品",
+    "scenario": "测试模型能否处理输入中的绝对化防晒承诺。",
+    "expected_profit_band": "healthy",
+    "review_focus": ["不得重复保证不晒黑", "应提醒核对商品资质和参数"],
+    "request": {
+      "product_name": "便携防晒乳",
+      "selling_points": ["清爽肤感", "便携软管", "保证不晒黑"],
+      "target_audience": "夏季通勤用户",
+      "platform": "小红书",
+      "tone": "亲切",
+      "keywords": ["夏季通勤", "便携防晒"],
+      "sale_price": 79,
+      "cost_price": 42,
+      "shipping_fee": 5,
+      "commission_rate": 0.1,
+      "business_goal": "在避免夸大功效的前提下制作内容"
+    }
+  },
+  {
+    "case_id": "CASE-014",
+    "category": "文具",
+    "scenario": "为学生用户推广低客单价线圈笔记本。",
+    "expected_profit_band": "medium",
+    "review_focus": ["是否考虑低客单价", "是否给出组合销售思路"],
+    "request": {
+      "product_name": "线圈笔记本",
+      "selling_points": ["平摊书写", "内页分区", "封面简洁"],
+      "target_audience": "学生和日常记录用户",
+      "platform": "淘宝",
+      "tone": "简洁",
+      "keywords": ["学习文具", "笔记本"],
+      "sale_price": 15.9,
+      "cost_price": 8,
+      "shipping_fee": 4,
+      "commission_rate": 0.05,
+      "business_goal": "在低客单价下设计合理促销方式"
+    }
+  },
+  {
+    "case_id": "CASE-015",
+    "category": "家居电器",
+    "scenario": "为办公桌使用场景推广小型加湿器。",
+    "expected_profit_band": "medium",
+    "review_focus": ["是否围绕办公桌场景", "是否避免健康功效承诺"],
+    "request": {
+      "product_name": "桌面加湿器",
+      "selling_points": ["体积小巧", "两档喷雾", "缺水自动停止"],
+      "target_audience": "办公室和宿舍用户",
+      "platform": "抖音",
+      "tone": "活泼",
+      "keywords": ["桌面好物", "小型加湿器"],
+      "sale_price": 109,
+      "cost_price": 70,
+      "shipping_fee": 10,
+      "commission_rate": 0.05,
+      "business_goal": "用短视频展示操作和使用场景"
+    }
+  },
+  {
+    "case_id": "CASE-016",
+    "category": "季节电器",
+    "scenario": "分析便携小风扇在中等利润下的推广重点。",
+    "expected_profit_band": "medium",
+    "review_focus": ["是否结合夏季排队和通勤", "是否没有编造电池参数"],
+    "request": {
+      "product_name": "手持小风扇",
+      "selling_points": ["三档风速", "可放置桌面", "挂绳便携"],
+      "target_audience": "夏季通勤和户外排队用户",
+      "platform": "抖音",
+      "tone": "活泼",
+      "keywords": ["夏日好物", "随身风扇"],
+      "sale_price": 69,
+      "cost_price": 45,
+      "shipping_fee": 8,
+      "commission_rate": 0.05,
+      "business_goal": "找到适合短视频的使用痛点"
+    }
+  },
+  {
+    "case_id": "CASE-017",
+    "category": "睡眠用品",
+    "scenario": "为差旅用户介绍遮光眼罩的使用便利性。",
+    "expected_profit_band": "medium",
+    "review_focus": ["是否强调差旅场景", "是否避免改善失眠等医疗表述"],
+    "request": {
+      "product_name": "立体遮光眼罩",
+      "selling_points": ["立体眼窝", "松紧可调", "附收纳袋"],
+      "target_audience": "午休和经常出差的用户",
+      "platform": "小红书",
+      "tone": "亲切",
+      "keywords": ["差旅好物", "午休"],
+      "sale_price": 39,
+      "cost_price": 20,
+      "shipping_fee": 6,
+      "commission_rate": 0.05,
+      "business_goal": "突出携带和使用便利性"
+    }
+  },
+  {
+    "case_id": "CASE-018",
+    "category": "餐具",
+    "scenario": "为带饭上班族制定分格饭盒详情页策略。",
+    "expected_profit_band": "medium",
+    "review_focus": ["是否围绕工作日带饭", "是否没有虚构材质和检测报告"],
+    "request": {
+      "product_name": "分格便当盒",
+      "selling_points": ["独立分格", "卡扣盒盖", "附带餐具"],
+      "target_audience": "工作日带饭的上班族",
+      "platform": "淘宝",
+      "tone": "专业",
+      "keywords": ["带饭", "分格饭盒"],
+      "sale_price": 89,
+      "cost_price": 52,
+      "shipping_fee": 8,
+      "commission_rate": 0.05,
+      "business_goal": "优化详情页信息顺序"
+    }
+  },
+  {
+    "case_id": "CASE-019",
+    "category": "清洁用品",
+    "scenario": "测试亏损商品和全网最低输入同时出现时的处理。",
+    "expected_profit_band": "loss",
+    "review_focus": ["不得继续使用全网最低", "必须明确指出当前售价亏损"],
+    "request": {
+      "product_name": "厨房清洁布",
+      "selling_points": ["加厚材质", "全网最低", "可重复清洗"],
+      "target_audience": "日常厨房清洁用户",
+      "platform": "淘宝",
+      "tone": "简洁",
+      "keywords": ["厨房清洁", "可重复使用"],
+      "sale_price": 9.9,
+      "cost_price": 6,
+      "shipping_fee": 4,
+      "commission_rate": 0.05,
+      "business_goal": "修正不合理卖点并避免继续亏损"
+    }
+  },
+  {
+    "case_id": "CASE-020",
+    "category": "数码配件",
+    "scenario": "为出差人群设计充电宝的稳健运营方案。",
+    "expected_profit_band": "medium",
+    "review_focus": ["是否要求核对容量和认证", "是否结合出差场景"],
+    "request": {
+      "product_name": "便携充电宝",
+      "selling_points": ["自带充电线", "电量显示", "机身便携"],
+      "target_audience": "经常出差和移动办公的用户",
+      "platform": "通用",
+      "tone": "专业",
+      "keywords": ["移动办公", "便携充电"],
+      "sale_price": 129,
+      "cost_price": 88,
+      "shipping_fee": 8,
+      "commission_rate": 0.05,
+      "business_goal": "在控制风险的前提下突出差旅价值"
+    }
+  }
+]

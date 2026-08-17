@@ -31,6 +31,7 @@ app/repositories/               SQLAlchemy 数据访问
 app/models/                     SQLite 表模型
 app/web/                        中文网页、样式和交互逻辑
 tests/                          接口、数据库、服务、启动器和容器配置测试
+evaluation/                     20 条模拟案例、自动检查、报告与人工评分工具
 run_server.py                   自动检测空闲端口的一键启动器
 Dockerfile、compose.yaml        可选容器配置；当前未完成真实构建验证
 ```
@@ -110,7 +111,8 @@ Windows 上被异常结束的本地服务留下了端口占用，导致 Uvicorn 
 - 封装兼容 Chat Completions 的千问客户端，使用 `.env` 管理密钥和模型配置，避免敏感信息进入 Git；
 - 使用 SQLAlchemy 与 SQLite 保存批量任务、Agent 请求结果、执行轨迹和用户反馈，支持历史详情回放；
 - 使用 openpyxl 实现 Excel 逐行校验、利润批量分析和结果导出；
-- 编写 40 项 pytest 自动化测试，通过模拟 AI 客户端和临时数据库降低测试成本并保证可重复性，并使用 GitHub Actions 在推送和合并请求时自动回归；
+- 编写 47 项 pytest 自动化测试，通过模拟 AI 客户端和临时数据库降低测试成本并保证可重复性，并使用 GitHub Actions 在推送和合并请求时自动回归；
+- 构建 20 条离线案例和批量评测工具，自动统计工作流约定、风险状态和响应耗时，并生成人工评分模板；
 - 针对 Windows 本地端口残留问题实现自动端口探测启动器，提高 PyCharm 演示稳定性。
 
 ## 六、现场演示顺序

@@ -17,5 +17,8 @@ data/output/*
 !data/input/.gitkeep
 !data/output/.gitkeep
 
+evaluation/results/*
+!evaluation/results/.gitkeep
+
 # 本地工具与操作记录
 scripts/*.local.*

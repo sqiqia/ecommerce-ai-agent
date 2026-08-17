@@ -13,7 +13,7 @@
 | 核心闭环 | 业务输入 → 利润工具 → 千问 → JSON 校验 → 风险检查 → 历史与反馈 |
 | 后端能力 | FastAPI、Pydantic、SQLAlchemy、异常映射和 OpenAPI |
 | 数据处理 | 单品利润分析、Excel 逐行校验、批量处理和结果导出 |
-| 可验证性 | 40 项 pytest；Fake AI Client；临时 SQLite；GitHub Actions 自动回归 |
+| 可验证性 | 47 项 pytest；20 条离线案例；Fake AI Client；GitHub Actions 自动回归 |
 | 真实边界 | 本地单用户应用；没有真实转化率数据、登录权限和公网部署 |
 
 简历写法、能力证据和不能夸大的内容见 [项目复盘与简历材料](docs/PROJECT_REVIEW.md)。
@@ -97,6 +97,7 @@ flowchart LR
 - Agent 内容风险检查：标记绝对化或无法直接核验的表述，提醒人工复核，不增加模型调用
 - Agent 运行信息：记录成功工作流的耗时与模型调用次数
 - Agent 真实反馈：`POST /agent/runs/{run_id}/feedback`，保存“有帮助/需要改进”和文字意见
+- 离线评测：20 条模拟案例、批量模型调用、自动约定检查、报告和人工评分模板
 
 网页端的“Agent 分析历史”会自动列出最近 20 次成功运行；点击“查看详情”可回放完整报告并恢复当时的表单输入。失败的模型调用不会写入历史记录。
 
@@ -172,13 +173,23 @@ AI 文案模块支持兼容 Chat Completions 格式的大模型服务。真实�
 `.env` 中填写 `AI_API_KEY`、`AI_BASE_URL` 和 `AI_MODEL`。不要把真实 Key 写入
 代码、`.env.example` 或提交到 GitHub。
 
+## 离线评测
+
+不需要真实店铺或上架商品。项目提供 20 条明确标注为模拟数据的商品案例，覆盖四个平台和四种利润状态。默认命令只验证案例，不调用模型：
+
+```powershell
+python -m evaluation.run_evaluation
+```
+
+真实执行需要同时添加 `--execute --confirm-paid-calls`，避免误触付费调用。详细步骤、输出文件和人工评分方法见 [离线评测使用说明](evaluation/README.md)。
+
 ## 测试
 
 ```powershell
 python -m pytest -q
 ```
 
-当前完整测试数量：`40`。测试中的模型响应均为本地模拟数据，不会消耗千问额度。
+当前完整测试数量：`47`。测试中的模型响应均为本地模拟数据，不会消耗千问额度。
 
 GitHub Actions 会在推送到 `main` 或创建合并请求时执行同一条测试命令。只有工作流实际显示通过，才能把“持续集成”作为已验证能力。
 
