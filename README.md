@@ -1,8 +1,22 @@
 # 电商运营自动化 Agent
 
-这是一个基于 FastAPI、千问大模型和 SQLite 的中文电商运营 AI 应用。它不是只调用一次模型 API 的演示，而是覆盖了业务输入、工具计算、Prompt 构建、结构化输出、风险检查、历史持久化和用户反馈的完整应用链路。
+[![Python tests](https://github.com/sqiqia/ecommerce-ai-agent/actions/workflows/tests.yml/badge.svg)](https://github.com/sqiqia/ecommerce-ai-agent/actions/workflows/tests.yml)
 
-> 项目定位：AI 应用开发求职作品集。当前版本专注代码可解释和流程可验证，既支持 PyCharm 本地运行，也提供 Docker 容器配置；Redis、RAG 和服务拆分将按可验证阶段逐步加入。
+这是一个基于 FastAPI、千问大模型和 SQLite 的中文电商运营 AI 应用。项目重点不是证明 AI 文案一定能提高销量，而是展示如何把大模型接入一条有业务规则、结构化输出、数据持久化和自动化测试的应用链路。
+
+> 项目定位：初级 AI 应用开发求职作品集，不是生产级电商 SaaS，也不把固定步骤工作流包装成通用自主智能体。
+
+## 招聘方速览
+
+| 项目维度 | 已完成内容 |
+|---|---|
+| 核心闭环 | 业务输入 → 利润工具 → 千问 → JSON 校验 → 风险检查 → 历史与反馈 |
+| 后端能力 | FastAPI、Pydantic、SQLAlchemy、异常映射和 OpenAPI |
+| 数据处理 | 单品利润分析、Excel 逐行校验、批量处理和结果导出 |
+| 可验证性 | 40 项 pytest；Fake AI Client；临时 SQLite；GitHub Actions 自动回归 |
+| 真实边界 | 本地单用户应用；没有真实转化率数据、登录权限和公网部署 |
+
+简历写法、能力证据和不能夸大的内容见 [项目复盘与简历材料](docs/PROJECT_REVIEW.md)。
 
 ## 项目解决什么问题
 
@@ -48,8 +62,8 @@ flowchart LR
 | 数据处理 | openpyxl | Excel 导入、逐行分析和结果导出 |
 | 前端 | HTML、CSS、JavaScript | 无额外前端框架的中文操作界面 |
 | 测试 | pytest、FastAPI TestClient | 接口、服务、数据库和启动器自动化测试 |
-| 工程化 | Git、GitHub、`.env` | 版本管理、公开展示和密钥隔离 |
-| 容器化 | Docker、Compose | 非 root 镜像、健康检查和 SQLite 数据卷 |
+| 工程化 | Git、GitHub Actions、`.env` | 版本管理、自动测试和密钥隔离 |
+| 可选容器配置 | Docker、Compose | 非 root 镜像、健康检查和 SQLite 数据卷；当前未做实机验证 |
 
 ## 值得在面试中讲的设计
 
@@ -60,6 +74,7 @@ flowchart LR
 5. **真实反馈代替虚假评分**：项目删除了缺乏业务依据的自动分数，改为风险提示和用户反馈。
 6. **可测试性**：测试使用模拟 AI 客户端和临时 SQLite，不花费模型额度、不污染正式数据。
 7. **本地可用性**：一键启动器会实际检测端口，自动避开 Windows 残留端口占用。
+8. **持续集成**：GitHub Actions 会在推送和合并请求时自动运行完整测试。
 
 更完整的面试讲解、简历写法和常见追问见 [项目面试指南](docs/INTERVIEW_GUIDE.md)。
 
@@ -117,7 +132,9 @@ python run_server.py
 python run_server.py --port 8010
 ```
 
-## Docker 运行
+## 可选：Docker 配置
+
+仓库保留了 Dockerfile 和 Compose 配置，但作者当前环境没有完成真实镜像构建验证，因此 Docker 不作为简历成果。安装 Docker Desktop 的使用者可以自行验证：
 
 本机安装 Docker Desktop 后，在项目根目录执行：
 
@@ -162,6 +179,8 @@ python -m pytest -q
 ```
 
 当前完整测试数量：`40`。测试中的模型响应均为本地模拟数据，不会消耗千问额度。
+
+GitHub Actions 会在推送到 `main` 或创建合并请求时执行同一条测试命令。只有工作流实际显示通过，才能把“持续集成”作为已验证能力。
 
 ## 当前边界
 
