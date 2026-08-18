@@ -1,209 +1,132 @@
-# 电商运营自动化 Agent
+# 电商运营 AI 工作流
 
 [![Python tests](https://github.com/sqiqia/ecommerce-ai-agent/actions/workflows/tests.yml/badge.svg)](https://github.com/sqiqia/ecommerce-ai-agent/actions/workflows/tests.yml)
 
-这是一个基于 FastAPI、千问大模型和 SQLite 的中文电商运营 AI 应用。项目重点不是证明 AI 文案一定能提高销量，而是展示如何把大模型接入一条有业务规则、结构化输出、数据持久化和自动化测试的应用链路。
+基于 FastAPI、千问和 SQLite 开发的中文 AI 应用作品集。系统先用 Python 工具计算可信利润，再让大模型生成结构化运营策略，并对结果执行格式校验、事实边界约束、风险检查、Token 成本记录和历史持久化。
 
-> 项目定位：初级 AI 应用开发求职作品集，不是生产级电商 SaaS，也不把固定步骤工作流包装成通用自主智能体。
+> 项目定位：用于展示初级 AI 应用开发能力的本地作品集，不声称提升真实销量，也不包装成生产级电商 SaaS。
 
-## 招聘方速览
+## 招聘方先看这里
 
-| 项目维度 | 已完成内容 |
+- [真实迭代案例](docs/CASE_STUDY.md)：三次成功的真实模型调用，展示事实编造、风险误报、超时和成本问题如何被发现与修复；
+- [面试讲解手册](docs/INTERVIEW_GUIDE.md)：项目介绍、技术流程、问题解决、能力证据和常见追问；
+- [GitHub Actions](https://github.com/sqiqia/ecommerce-ai-agent/actions)：每次推送自动运行完整测试。
+
+| 维度 | 已实现证据 |
 |---|---|
-| 核心闭环 | 业务输入 → 利润工具 → 千问 → JSON 校验 → 风险检查 → 历史与反馈 |
-| 后端能力 | FastAPI、Pydantic、SQLAlchemy、异常映射和 OpenAPI |
-| 数据处理 | 单品利润分析、Excel 逐行校验、批量处理和结果导出 |
-| 可验证性 | 50 项 pytest；20 条离线案例；Fake AI Client；GitHub Actions 自动回归 |
-| 真实边界 | 本地单用户应用；没有真实转化率数据、登录权限和公网部署 |
-
-招聘方可以先阅读 [真实迭代案例说明](docs/CASE_STUDY.md)，了解项目如何通过三次成功的真实模型调用发现并处理事实编造、风险误报、超时和成本记录问题。简历写法、能力证据和不能夸大的内容见 [项目复盘与简历材料](docs/PROJECT_REVIEW.md)。
-
-## 项目解决什么问题
-
-电商运营人员经常需要重复处理商品利润、营销文案和运营策略。本项目把这些步骤集中到一个中文工作台中：
-
-- 输入售价、成本和佣金后，由确定性工具计算利润，避免让大模型猜数字；
-- 将商品资料和利润结果交给千问，生成结构化运营方案；
-- 使用 Pydantic 校验模型输出，防止缺少定价、营销、风险或行动计划字段；
-- 标记“保证、销量第一、全网最低”等不应直接发布的高风险表述，同时识别“禁止使用”等提醒语境，减少误报；
-- 记录供应商返回的输入、输出和总 Token，并按本地配置的匹配模型单价估算费用；
-- 保存分析记录、执行轨迹和真实用户反馈，支持后续复盘；
-- 批量处理 Excel 商品数据，并保存任务或导出结果。
+| AI 调用 | 兼容 Chat Completions 的千问客户端、超时与异常映射 |
+| 工作流 | 业务输入 → 利润工具 → Prompt → 模型 → 校验 → 风险检查 → 持久化 |
+| 可靠性 | Pydantic 结构校验、Prompt 事实白名单、语境化风险检查 |
+| 可观察性 | 执行轨迹、耗时、Token、预估费用、历史回放和用户反馈 |
+| 数据处理 | Excel 逐行校验、批量利润分析和结果导出 |
+| 可验证性 | 47 项 pytest、20 条离线案例、Fake AI Client、GitHub Actions |
 
 ## 系统架构
 
 ```mermaid
 flowchart LR
-    A["中文网页表单"] --> B["FastAPI 接口"]
-    B --> C["Pydantic 参数校验"]
-    C --> D["利润计算工具"]
-    D --> E["Prompt 构建"]
-    E --> F["千问大模型"]
-    F --> G["结构化结果校验"]
-    G --> H["内容风险检查"]
+    A["中文网页"] --> B["FastAPI"]
+    B --> C["Pydantic 输入校验"]
+    C --> D["Python 利润工具"]
+    D --> E["事实白名单 Prompt"]
+    E --> F["千问模型"]
+    F --> G["结构化 JSON 校验"]
+    G --> H["语境化风险检查"]
     H --> I["SQLite 历史记录"]
-    I --> J["结果回放与用户反馈"]
+    I --> J["结果回放与反馈"]
+    G --> K["Token 与费用"]
 ```
 
-一次 Agent 请求的核心流程：
+项目把任务分为两类：
 
-```text
-接收业务目标 → 调用利润工具 → 构建带真实数据的 Prompt → 调用千问
-→ 校验 JSON 结构 → 检查风险表述 → 保存执行记录 → 网页展示与反馈
-```
+- 利润、佣金和成本属于确定性规则，由 Python 计算；
+- 文案和运营建议属于生成任务，由大模型处理。
+
+这样可以避免让模型承担不稳定的数值计算，同时保留语言生成能力。
+
+## 核心功能
+
+| 功能 | 接口或入口 |
+|---|---|
+| 中文工作台 | `GET /` |
+| 健康检查 | `GET /health` |
+| 单品利润分析 | `POST /products/analyze` |
+| Excel 批量分析与导出 | `POST /products/analyze-excel`、`/export` |
+| Excel 任务历史 | `POST /tasks/analyze-excel`、`GET /tasks` |
+| AI 文案生成 | `POST /copywriting/generate` |
+| 电商运营工作流 | `POST /agent/analyze` |
+| Agent 历史与回放 | `GET /agent/runs`、`GET /agent/runs/{id}` |
+| 真实用户反馈 | `POST /agent/runs/{id}/feedback` |
+| 自动接口文档 | `GET /docs` |
+
+网页会展示利润工具结果、结构化策略、执行轨迹、风险状态、响应时间、Token 和预估费用。失败的模型调用不会写入成功历史记录。
+
+## 真实迭代结果
+
+固定案例 `CASE-001` 使用相同业务输入完成三次成功调用：
+
+| 阶段 | 主要结果 |
+|---|---|
+| 初始版本 | JSON 通过，但编造赠品、试用人数、广告成本和产品能力；风险提醒被误报 |
+| Prompt 1.1 | 误报消失并开始记录 Token/费用，但仍推断多设备切换、篇数和具体体验 |
+| Prompt 1.2，温度 0.2 | 上述事实扩展未再次出现；4,320 Token；预估费用 ¥0.0029478；耗时 23.183 秒 |
+
+这只是单条案例结果，不能代表全部场景，也不能证明商业效果。完整证据与实验限制见[真实迭代案例](docs/CASE_STUDY.md)。
 
 ## 技术栈
 
-| 分类 | 技术 | 在项目中的用途 |
-|---|---|---|
-| 后端 | Python、FastAPI | 接口、依赖注入、异常处理、OpenAPI 文档 |
-| 数据校验 | Pydantic | 请求参数约束和大模型结构化输出校验 |
-| 大模型 | 阿里云百炼千问 | 商品文案和运营策略生成 |
-| 数据库 | SQLite、SQLAlchemy | Agent 历史、Excel 任务和用户反馈持久化 |
-| 数据处理 | openpyxl | Excel 导入、逐行分析和结果导出 |
-| 前端 | HTML、CSS、JavaScript | 无额外前端框架的中文操作界面 |
-| 测试 | pytest、FastAPI TestClient | 接口、服务、数据库和启动器自动化测试 |
-| 工程化 | Git、GitHub Actions、`.env` | 版本管理、自动测试和密钥隔离 |
-| 可选容器配置 | Docker、Compose | 非 root 镜像、健康检查和 SQLite 数据卷；当前未做实机验证 |
-
-## 值得在面试中讲的设计
-
-1. **工具结果优先**：利润由 Python 工具计算，再提供给模型，降低数值幻觉。
-2. **结构化输出**：模型必须返回固定 JSON 字段，异常响应会被识别而不是直接展示。
-3. **事实边界**：Prompt 使用事实白名单，卖点只允许原样引用，并将模型温度降至 `0.2` 减少自由发挥。
-4. **可观察工作流**：网页展示每一步执行者、运行耗时、模型调用次数、Token 用量和预估费用。
-5. **安全边界**：API Key 只保存在被 Git 忽略的 `.env`，接口不会返回密钥。
-6. **真实反馈代替虚假评分**：项目删除了缺乏业务依据的自动分数，改为风险提示和用户反馈。
-7. **可测试性**：测试使用模拟 AI 客户端和临时 SQLite，不花费模型额度、不污染正式数据。
-8. **本地可用性**：一键启动器会实际检测端口，自动避开 Windows 残留端口占用。
-9. **持续集成**：GitHub Actions 会在推送和合并请求时自动运行完整测试。
-
-更完整的面试讲解、简历写法和常见追问见 [项目面试指南](docs/INTERVIEW_GUIDE.md)。
-
-## 已实现功能
-
-- FastAPI 应用骨架
-- PyCharm 一键启动器：自动避开被占用的本地端口
-- 中文可视化工作台：`GET /`
-- 健康检查：`GET /health`
-- 商品利润分析：`POST /products/analyze`
-- Excel 批量分析：`POST /products/analyze-excel`
-- Excel 结果导出：`POST /products/analyze-excel/export`
-- 保存 Excel 分析任务：`POST /tasks/analyze-excel`
-- 历史任务列表：`GET /tasks`
-- 任务详情：`GET /tasks/{task_id}`
-- AI 文案 Prompt 预览：`POST /copywriting/prompt-preview`
-- AI 商品文案生成：`POST /copywriting/generate`
-- 电商运营 Agent：`POST /agent/analyze`，自动调用利润工具并生成运营策略与执行轨迹
-- Agent 历史记录：`GET /agent/runs`、`GET /agent/runs/{run_id}`
-- Agent 内容风险检查：标记绝对化或无法直接核验的表述，提醒人工复核，不增加模型调用
-- Agent 运行信息：记录成功工作流的耗时、模型调用次数、Token 用量和本地预估费用
-- Agent 真实反馈：`POST /agent/runs/{run_id}/feedback`，保存“有帮助/需要改进”和文字意见
-- 离线评测：20 条模拟案例、批量模型调用、自动约定检查、报告和人工评分模板
-
-网页端的“Agent 分析历史”会自动列出最近 20 次成功运行；点击“查看详情”可回放完整报告并恢复当时的表单输入。失败的模型调用不会写入历史记录。
-
-查看本地 SQLite 数据库概要：
-
-```powershell
-python scripts/inspect_database.py
-```
-- 自动接口文档：`GET /docs`
-- 基础自动化测试
+| 分类 | 技术 |
+|---|---|
+| 后端 | Python、FastAPI |
+| 数据契约 | Pydantic |
+| 大模型 | 阿里云百炼千问 |
+| 数据库 | SQLite、SQLAlchemy |
+| Excel | openpyxl |
+| 前端 | HTML、CSS、JavaScript |
+| 测试与工程化 | pytest、FastAPI TestClient、Git、GitHub Actions |
 
 ## 本地运行
 
-推荐直接运行启动器，它会从 8000 开始自动寻找空闲端口：
+推荐 Python 3.12。在项目根目录执行：
 
 ```powershell
-python -m pip install -r requirements.txt
-python run_server.py
-```
-
-终端会打印实际访问地址。例如 8000、8001 被占用时，会自动切换到 8002：
-
-```text
-端口 8000 已被占用，已自动切换到 8002。
-中文工作台：http://127.0.0.1:8002
-健康检查：http://127.0.0.1:8002/health
-接口文档：http://127.0.0.1:8002/docs
-```
-
-需要指定起始端口时使用：
-
-```powershell
-python run_server.py --port 8010
-```
-
-## 可选：Docker 配置
-
-仓库保留了 Dockerfile 和 Compose 配置，但作者当前环境没有完成真实镜像构建验证，因此 Docker 不作为简历成果。安装 Docker Desktop 的使用者可以自行验证：
-
-本机安装 Docker Desktop 后，在项目根目录执行：
-
-```powershell
-# 首次克隆项目时创建本机配置；已有 .env 不要重复执行这一行
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 Copy-Item .env.example .env
-docker compose up --build
 ```
 
-默认访问地址：
+在本地 `.env` 中填写模型配置。真实 API Key 不要写入代码或 `.env.example`。
 
-```text
-中文工作台：http://127.0.0.1:8080
-健康检查：http://127.0.0.1:8080/health
-接口文档：http://127.0.0.1:8080/docs
-```
-
-选择 8080 是为了避开本机开发中常见的 8000、8001 端口占用。需要修改宿主机端口时，在 `.env` 中添加：
-
-```text
-APP_HOST_PORT=8090
-```
-
-Compose 使用具名卷 `ecommerce_data` 保存 SQLite 数据，因此正常重建容器不会删除历史记录。真实 `.env` 只在运行时注入，`.dockerignore` 会阻止它进入镜像。镜像使用 `requirements-prod.txt`，不会安装 pytest 等开发测试工具。
-
-中文工作台包含五个可操作板块：
-
-1. 电商运营 Agent：自动调用利润工具，再由大模型生成运营策略、风险提醒和行动计划。
-2. AI 商品文案：填写商品卖点、目标用户和平台，调用大模型生成结构化文案。
-3. 单品利润测算：计算佣金、总成本、利润和利润率。
-4. Excel 批量分析：上传 `.xlsx` 表格，保存任务或下载分析结果。
-5. 任务记录管理：查看保存在 SQLite 中的历史分析任务。
-
-AI 文案模块支持兼容 Chat Completions 格式的大模型服务。真实调用前，需要在本机
-`.env` 中填写 `AI_API_KEY`、`AI_BASE_URL` 和 `AI_MODEL`。不要把真实 Key 写入
-代码、`.env.example` 或提交到 GitHub。
-
-## 离线评测
-
-不需要真实店铺或上架商品。项目提供 20 条明确标注为模拟数据的商品案例，覆盖四个平台和四种利润状态。默认命令只验证案例，不调用模型：
+启动程序：
 
 ```powershell
-python -m evaluation.run_evaluation
+.\.venv\Scripts\python.exe run_server.py
 ```
 
-真实执行需要同时添加 `--execute --confirm-paid-calls`，避免误触付费调用。详细步骤、输出文件和人工评分方法见 [离线评测使用说明](evaluation/README.md)。
+启动器会从 8000 开始寻找空闲端口，并在终端打印中文工作台、健康检查和接口文档地址。
 
-## 测试
+## 测试与评测
+
+运行47项自动化测试：
 
 ```powershell
-python -m pytest -q
+.\.venv\Scripts\python.exe -m pytest -q
 ```
 
-当前完整测试数量：`50`。测试中的模型响应均为本地模拟数据，不会消耗千问额度。
+测试使用模拟模型与临时数据库，不访问千问，不产生模型费用。
 
-GitHub Actions 会在推送到 `main` 或创建合并请求时执行同一条测试命令。只有工作流实际显示通过，才能把“持续集成”作为已验证能力。
+校验20条离线案例：
 
-## 当前边界
+```powershell
+.\.venv\Scripts\python.exe -m evaluation.run_evaluation
+```
 
-为了保证项目适合初学者理解和本机演示，当前版本有意保留以下边界：
+默认命令不调用真实模型。付费评测必须显式添加 `--execute --confirm-paid-calls`，说明见[离线评测文档](evaluation/README.md)。
 
-- Agent 是可解释的固定步骤编排，不是能够无限自主执行的通用智能体；
-- 风险检查基于词表和否定语境规则，只负责提醒人工复核，不等同于完整内容安全系统；
-- 页面费用是按 `.env` 单价计算的本地估值，实际扣费受上下文档位、缓存、免费额度和活动影响，以供应商账单为准；
-- SQLite 适合单机练习和演示，不适合多实例高并发生产环境；
-- 当前没有登录、权限控制、支付和公网部署；
-- 失败的模型调用会向用户显示错误，但不会写入成功历史记录。
+## 项目边界
 
-这些限制是当前阶段的主动取舍，不应在面试中包装成已经完成的生产级能力。
+- 当前是本地单用户 SQLite 应用，没有登录、权限、支付和公网部署；
+- Agent 是固定、可解释的工作流，不是通用自主智能体；
+- Prompt 与规则只能降低事实编造和风险误报，不能保证完全消除；
+- Token 费用是按本地配置单价计算的估值，实际金额以供应商账单为准；
+- 没有真实店铺对照数据，因此不声称提升销量、转化率或运营效率。
