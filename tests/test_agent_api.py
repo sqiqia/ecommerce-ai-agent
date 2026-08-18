@@ -80,9 +80,11 @@ class FakeAIClient:
         assert "单件利润：32.05 元" in prompt.user_prompt
         assert "利润率：40.57%" in prompt.user_prompt
         assert "小红书" in prompt.user_prompt
-        assert prompt.prompt_version == "1.1"
-        assert "不得擅自添加预算、赠品、试用人数" in prompt.user_prompt
-        assert "只有用户本次明确提供" in prompt.system_prompt
+        assert prompt.prompt_version == "1.2"
+        assert "不得添加事实白名单之外的数字" in prompt.user_prompt
+        assert "卖点只能原样引用" in prompt.system_prompt
+        assert "蓝牙双模”不等于“支持多设备切换" in prompt.system_prompt
+        assert "不得要求运营者伪装成真实用户" in prompt.system_prompt
         return GeneratedOperationStrategy(
             overall_assessment="商品利润健康，适合面向差旅办公人群推广。",
             pricing_suggestion="保持当前价格，优先测试小幅优惠券。",

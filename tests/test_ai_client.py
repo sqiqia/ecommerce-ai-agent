@@ -15,7 +15,7 @@ from app.services.ai_client import (
 
 def make_prompt() -> CopywritingPromptResponse:
     return CopywritingPromptResponse(
-        prompt_version="1.1",
+        prompt_version="1.2",
         system_prompt="你是一名电商文案策划师。",
         user_prompt="请为无线鼠标生成文案。",
     )
@@ -30,6 +30,7 @@ def test_ai_client_generates_structured_copywriting() -> None:
         assert body["messages"][0]["role"] == "system"
         assert body["messages"][1]["role"] == "user"
         assert body["response_format"] == {"type": "json_object"}
+        assert body["temperature"] == 0.2
 
         generated_content = json.dumps(
             {

@@ -47,6 +47,7 @@ class AIChatClient:
         base_url: str,
         model: str,
         timeout_seconds: float = 60,
+        temperature: float = 0.2,
         http_client: httpx.Client | None = None,
         pricing_model: str = "",
         input_price_per_million_tokens: Decimal = Decimal("0"),
@@ -56,6 +57,7 @@ class AIChatClient:
         self.base_url = base_url.strip().rstrip("/")
         self.model = model.strip()
         self.timeout_seconds = timeout_seconds
+        self.temperature = temperature
         self._http_client = http_client
         self.pricing_model = pricing_model.strip()
         self.input_price_per_million_tokens = input_price_per_million_tokens
@@ -81,7 +83,7 @@ class AIChatClient:
                 {"role": "system", "content": prompt.system_prompt},
                 {"role": "user", "content": prompt.user_prompt},
             ],
-            "temperature": 0.7,
+            "temperature": self.temperature,
             "response_format": {"type": "json_object"},
         }
         self.last_usage = None

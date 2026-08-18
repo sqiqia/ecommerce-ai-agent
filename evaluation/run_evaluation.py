@@ -78,6 +78,7 @@ def make_ai_client() -> AIChatClient:
         base_url=settings.ai_base_url,
         model=settings.ai_model,
         timeout_seconds=settings.ai_timeout_seconds,
+        temperature=settings.ai_temperature,
         pricing_model=settings.ai_pricing_model,
         input_price_per_million_tokens=settings.ai_input_price_per_million_tokens,
         output_price_per_million_tokens=settings.ai_output_price_per_million_tokens,

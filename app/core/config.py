@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     ai_base_url: str = ""
     ai_model: str = ""
     ai_timeout_seconds: float = Field(default=60, gt=0, le=120)
+    ai_temperature: float = Field(default=0.2, ge=0, le=2)
     ai_pricing_model: str = ""
     ai_input_price_per_million_tokens: Decimal = Field(
         default=Decimal("0"),
