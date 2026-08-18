@@ -70,6 +70,7 @@ def run_ecommerce_agent(
         product_analysis=product_analysis,
         strategy=strategy,
         execution_trace=execution_trace,
+        token_usage=getattr(ai_client, "last_usage", None),
     )
     response.guardrail = inspect_agent_result(response)
     return response

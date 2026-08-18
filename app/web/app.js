@@ -135,6 +135,14 @@ function renderAgentResult(result, feedback = null) {
     byId("agent-duration").textContent = runtime ? `${runtime.duration_ms} 毫秒` : "旧记录未统计";
     byId("agent-call-count").textContent = runtime ? `${runtime.model_call_count} 次` : "1 次";
 
+    const usage = result.token_usage;
+    byId("agent-input-tokens").textContent = usage ? usage.input_tokens.toLocaleString("zh-CN") : "供应商未返回";
+    byId("agent-output-tokens").textContent = usage ? usage.output_tokens.toLocaleString("zh-CN") : "供应商未返回";
+    byId("agent-estimated-cost").textContent = usage?.estimated_total_cost_yuan != null
+        ? `¥${Number(usage.estimated_total_cost_yuan).toFixed(6)}`
+        : "未配置匹配单价";
+    byId("agent-estimated-cost").title = usage?.pricing_note || "旧记录没有 Token 用量。";
+
     const guardrail = result.guardrail || {status: "passed", matched_phrases: [], message: "未发现预设高风险表述。"};
     const needsReview = guardrail.status === "needs_review";
     byId("agent-guardrail").classList.toggle("needs-review", needsReview);

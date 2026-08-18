@@ -28,6 +28,9 @@ def get_ai_client() -> AIChatClient:
         base_url=settings.ai_base_url,
         model=settings.ai_model,
         timeout_seconds=settings.ai_timeout_seconds,
+        pricing_model=settings.ai_pricing_model,
+        input_price_per_million_tokens=settings.ai_input_price_per_million_tokens,
+        output_price_per_million_tokens=settings.ai_output_price_per_million_tokens,
     )
 
 
@@ -80,4 +83,5 @@ def generate_copywriting(
         **generated.model_dump(),
         model=ai_client.model,
         prompt_version=prompt.prompt_version,
+        token_usage=getattr(ai_client, "last_usage", None),
     )

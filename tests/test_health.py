@@ -43,6 +43,8 @@ def test_frontend_static_files() -> None:
     assert "/agent/analyze" in js_response.text
     assert "/agent/runs" in js_response.text
     assert "runtime_metrics" in js_response.text
+    assert "token_usage" in js_response.text
+    assert "agent-estimated-cost" in client.get("/").text
     assert "/feedback" in js_response.text
 
 

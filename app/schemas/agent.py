@@ -3,6 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from app.schemas.ai import ModelTokenUsage
 from app.schemas.copywriting import CopywritingPromptRequest
 from app.schemas.product import ProductAnalyzeResponse
 
@@ -99,6 +100,7 @@ class AgentAnalyzeResponse(BaseModel):
     execution_trace: list[AgentExecutionStep]
     guardrail: AgentGuardrailResult | None = None
     runtime_metrics: AgentRuntimeMetrics | None = None
+    token_usage: ModelTokenUsage | None = None
 
 
 class AgentFeedbackRequest(BaseModel):
@@ -130,6 +132,7 @@ class AgentRunSummaryResponse(BaseModel):
     duration_ms: int | None
     model_call_count: int
     guardrail_status: Literal["passed", "needs_review"]
+    token_usage: ModelTokenUsage | None = None
     feedback: AgentFeedbackResponse | None
     created_at: datetime
 

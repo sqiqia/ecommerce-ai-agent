@@ -2,6 +2,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from app.schemas.ai import ModelTokenUsage
+
 
 class CopywritingPromptRequest(BaseModel):
     """生成商品文案 Prompt 时接收的数据。"""
@@ -74,3 +76,4 @@ class CopywritingGenerateResponse(GeneratedCopywriting):
 
     model: str
     prompt_version: str
+    token_usage: ModelTokenUsage | None = None

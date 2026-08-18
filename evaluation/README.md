@@ -47,7 +47,7 @@ python -m evaluation.run_evaluation --execute --confirm-paid-calls
 每次会生成三个文件：
 
 1. `evaluation_时间.json`：完整输入、模型结果和自动检查；
-2. `evaluation_时间.md`：成功率、工作流约定通过率、风险数量和耗时摘要；
+2. `evaluation_时间.md`：成功率、工作流约定通过率、风险数量、Token、预估费用和耗时摘要；
 3. `human_review_时间.csv`：人工评分表。
 
 ## 第四步：人工评分
@@ -77,5 +77,8 @@ python -m evaluation.summarize_reviews evaluation/results/human_review_你的时
 - 指定关键词覆盖率；
 - 亏损或低利润风险是否被提及；
 - 风险词命中数量和平均响应时间。
+- 供应商返回的输入、输出、总 Token 和按本地配置计算的预估费用。
+
+费用是本地估算值，不是供应商账单。请根据模型、地域和上下文长度，在 `.env` 中维护 `AI_PRICING_MODEL`、`AI_INPUT_PRICE_PER_MILLION_TOKENS` 和 `AI_OUTPUT_PRICE_PER_MILLION_TOKENS`。只有价格模型与调用模型完全一致时程序才估算费用；最新价格以[阿里云百炼官方模型价格](https://help.aliyun.com/zh/model-studio/model-pricing)为准。
 
 这些指标不能证明销量或转化率提高。只有真实上架并完成对照实验后才能描述商业效果，本项目当前不做这种声明。

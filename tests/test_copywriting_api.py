@@ -24,13 +24,15 @@ def test_preview_copywriting_prompt() -> None:
 
     assert response.status_code == 200
     body = response.json()
-    assert body["prompt_version"] == "1.0"
+    assert body["prompt_version"] == "1.1"
     assert "专业的电商文案策划师" in body["system_prompt"]
     assert "商品名称：无线鼠标" in body["user_prompt"]
     assert "1. 静音按键" in body["user_prompt"]
     assert "目标平台：小红书" in body["user_prompt"]
     assert "指定关键词：办公好物、便携" in body["user_prompt"]
     assert '"selling_copy"' in body["user_prompt"]
+    assert "不得自行添加销量、评价、认证" in body["user_prompt"]
+    assert "只有用户明确提供的信息" in body["system_prompt"]
 
 
 def test_preview_prompt_rejects_blank_selling_point() -> None:
@@ -85,7 +87,8 @@ def test_generate_copywriting_api() -> None:
         "selling_copy": "轻巧便携，静音按键搭配蓝牙双模，办公出差都方便。",
         "call_to_action": "立即体验高效办公。",
         "model": "fake-model",
-        "prompt_version": "1.0",
+        "prompt_version": "1.1",
+        "token_usage": None,
     }
 
 

@@ -1,6 +1,7 @@
 import csv
 import json
 from datetime import datetime
+from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 
 from evaluation.models import EvaluationResult, FailedEvaluationResult
@@ -18,7 +19,7 @@ HUMAN_SCORE_COLUMNS = (
 def build_summary(
     results: list[EvaluationResult],
     failures: list[FailedEvaluationResult],
-) -> dict[str, int | float]:
+) -> dict[str, int | float | None]:
     success_count = len(results)
     total_count = success_count + len(failures)
     contract_pass_count = sum(
@@ -28,6 +29,16 @@ def build_summary(
         result.automatic_checks.guardrail_status == "needs_review"
         for result in results
     )
+    usages = [
+        result.response.token_usage
+        for result in results
+        if result.response.token_usage is not None
+    ]
+    estimated_costs = [
+        Decimal(str(usage.estimated_total_cost_yuan))
+        for usage in usages
+        if usage.estimated_total_cost_yuan is not None
+    ]
     return {
         "total_count": total_count,
         "success_count": success_count,
@@ -45,6 +56,15 @@ def build_summary(
         )
         if success_count
         else 0,
+        "input_tokens": sum(usage.input_tokens for usage in usages),
+        "output_tokens": sum(usage.output_tokens for usage in usages),
+        "total_tokens": sum(usage.total_tokens for usage in usages),
+        "estimated_total_cost_yuan": float(
+            sum(estimated_costs, start=Decimal("0")).quantize(
+                Decimal("0.00000001"),
+                rounding=ROUND_HALF_UP,
+            )
+        ) if estimated_costs else None,
     }
 
 
@@ -89,27 +109,44 @@ def write_markdown_report(
         f"- 工作流约定通过率：{as_percent(float(summary['contract_pass_rate']))}",
         f"- 需要人工复核的风险结果：{summary['guardrail_needs_review_count']}",
         f"- 平均响应时间：{summary['average_duration_ms']} ms",
+        f"- 输入 Token：{summary['input_tokens']}",
+        f"- 输出 Token：{summary['output_tokens']}",
+        f"- 总 Token：{summary['total_tokens']}",
+        "- 本地预估费用："
+        + (
+            f"¥{float(summary['estimated_total_cost_yuan']):.8f}"
+            if summary["estimated_total_cost_yuan"] is not None
+            else "未配置匹配单价"
+        ),
         "",
         "> 自动检查只能验证格式和明确规则，不能证明文案能提升销量。",
         "",
         "## 案例结果",
         "",
-        "| 案例 | 商品 | 利润档位 | 约定检查 | 风险状态 | 耗时 |",
-        "|---|---|---|---|---|---:|",
+        "| 案例 | 商品 | 利润档位 | 约定检查 | 风险状态 | Token | 预估费用 | 耗时 |",
+        "|---|---|---|---|---|---:|---:|---:|",
     ]
     for result in results:
         checks = result.automatic_checks
+        usage = result.response.token_usage
+        token_text = str(usage.total_tokens) if usage else "未返回"
+        cost_text = (
+            f"¥{usage.estimated_total_cost_yuan:.8f}"
+            if usage and usage.estimated_total_cost_yuan is not None
+            else "未估算"
+        )
         lines.append(
             f"| {result.case.case_id} | {result.case.request.product_name} | "
             f"{result.case.expected_profit_band} | "
             f"{'通过' if checks.contract_passed else '未通过'} | "
-            f"{checks.guardrail_status} | {result.duration_ms} ms |"
+            f"{checks.guardrail_status} | {token_text} | {cost_text} | "
+            f"{result.duration_ms} ms |"
         )
     for failure in failures:
         lines.append(
             f"| {failure.case.case_id} | {failure.case.request.product_name} | "
             f"{failure.case.expected_profit_band} | 调用失败 | "
-            f"{failure.error_type} | {failure.duration_ms} ms |"
+            f"{failure.error_type} | - | - | {failure.duration_ms} ms |"
         )
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 

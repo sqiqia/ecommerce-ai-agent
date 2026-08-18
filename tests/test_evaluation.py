@@ -7,6 +7,7 @@ from uuid import uuid4
 import pytest
 
 from app.schemas.agent import GeneratedOperationStrategy
+from app.schemas.ai import ModelTokenUsage
 from app.services.agent_service import run_ecommerce_agent
 from evaluation.evaluator import evaluate_response, load_cases
 from evaluation.models import EvaluationResult
@@ -24,6 +25,18 @@ CASES_PATH = Path("evaluation/cases.json")
 
 class ContractCompliantClient:
     model = "fake-evaluation-model"
+    last_usage = ModelTokenUsage(
+        input_tokens=900,
+        output_tokens=100,
+        total_tokens=1000,
+        pricing_model="fake-evaluation-model",
+        input_price_per_million_yuan=0.2,
+        output_price_per_million_yuan=0.8,
+        estimated_input_cost_yuan=0.00018,
+        estimated_output_cost_yuan=0.00008,
+        estimated_total_cost_yuan=0.00026,
+        pricing_note="测试预估费用",
+    )
 
     def generate_structured(self, prompt, response_model):
         assert response_model is GeneratedOperationStrategy
@@ -114,7 +127,7 @@ def test_low_profit_case_requires_financial_risk_language() -> None:
     assert checks.contract_passed is False
 
 
-def test_risky_model_output_is_recorded_for_manual_review() -> None:
+def test_warning_language_does_not_trigger_manual_review() -> None:
     case = next(case for case in load_cases(CASES_PATH) if case.case_id == "CASE-019")
 
     class RiskyClient:
@@ -133,8 +146,8 @@ def test_risky_model_output_is_recorded_for_manual_review() -> None:
     checks = evaluate_response(case, response)
 
     assert checks.financial_risk_acknowledged is True
-    assert checks.guardrail_status == "needs_review"
-    assert checks.matched_risky_phrases == ["全网最低"]
+    assert checks.guardrail_status == "passed"
+    assert checks.matched_risky_phrases == []
 
 
 def test_reports_and_human_review_summary() -> None:
@@ -167,10 +180,14 @@ def test_reports_and_human_review_summary() -> None:
         )
         write_human_review_csv(review_path, [result])
 
-        assert json.loads(json_path.read_text(encoding="utf-8"))["summary"][
-            "contract_pass_rate"
-        ] == 1.0
+        json_summary = json.loads(json_path.read_text(encoding="utf-8"))["summary"]
+        assert json_summary["contract_pass_rate"] == 1.0
+        assert json_summary["total_tokens"] == 1000
+        assert json_summary["estimated_total_cost_yuan"] == 0.00026
         assert "工作流约定通过率：100.0%" in markdown_path.read_text(
+            encoding="utf-8"
+        )
+        assert "本地预估费用：¥0.00026000" in markdown_path.read_text(
             encoding="utf-8"
         )
         assert summarize_human_review(review_path)["completed_count"] == 0

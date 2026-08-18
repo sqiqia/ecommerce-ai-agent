@@ -50,6 +50,7 @@ def to_agent_run_summary(database: Session, run: AgentRun) -> AgentRunSummaryRes
         duration_ms=(result.runtime_metrics.duration_ms if result.runtime_metrics else None),
         model_call_count=(result.runtime_metrics.model_call_count if result.runtime_metrics else 1),
         guardrail_status=guardrail.status,
+        token_usage=result.token_usage,
         feedback=query_agent_feedback(database, run.id),
         created_at=run.created_at,
     )

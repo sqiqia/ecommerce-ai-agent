@@ -1,4 +1,5 @@
 import json
+from decimal import Decimal
 
 import httpx
 import pytest
@@ -14,7 +15,7 @@ from app.services.ai_client import (
 
 def make_prompt() -> CopywritingPromptResponse:
     return CopywritingPromptResponse(
-        prompt_version="1.0",
+        prompt_version="1.1",
         system_prompt="你是一名电商文案策划师。",
         user_prompt="请为无线鼠标生成文案。",
     )
@@ -40,7 +41,15 @@ def test_ai_client_generates_structured_copywriting() -> None:
         )
         return httpx.Response(
             200,
-            json={"choices": [{"message": {"content": generated_content}}]},
+            json={
+                "choices": [{"message": {"content": generated_content}}],
+                "usage": {
+                    "prompt_tokens": 500,
+                    "completion_tokens": 125,
+                    "total_tokens": 625,
+                    "prompt_tokens_details": {"cached_tokens": 100},
+                },
+            },
         )
 
     with httpx.Client(transport=httpx.MockTransport(handler)) as http_client:
@@ -49,12 +58,55 @@ def test_ai_client_generates_structured_copywriting() -> None:
             base_url="https://ai.example.com/v1/",
             model="test-model",
             http_client=http_client,
+            pricing_model="test-model",
+            input_price_per_million_tokens=Decimal("0.2"),
+            output_price_per_million_tokens=Decimal("0.8"),
         )
         result = client.generate(make_prompt())
 
     assert result.title == "静音双模无线鼠标"
     assert "蓝牙双模" in result.selling_copy
     assert result.call_to_action == "立即体验高效办公。"
+    assert client.last_usage is not None
+    assert client.last_usage.input_tokens == 500
+    assert client.last_usage.output_tokens == 125
+    assert client.last_usage.total_tokens == 625
+    assert client.last_usage.cached_input_tokens == 100
+    assert client.last_usage.estimated_input_cost_yuan == 0.0001
+    assert client.last_usage.estimated_output_cost_yuan == 0.0001
+    assert client.last_usage.estimated_total_cost_yuan == 0.0002
+
+
+def test_ai_client_does_not_apply_price_to_a_different_model() -> None:
+    content = json.dumps(
+        {"title": "标题", "selling_copy": "正文", "call_to_action": "行动"},
+        ensure_ascii=False,
+    )
+    transport = httpx.MockTransport(
+        lambda _: httpx.Response(
+            200,
+            json={
+                "choices": [{"message": {"content": content}}],
+                "usage": {"prompt_tokens": 10, "completion_tokens": 5},
+            },
+        )
+    )
+    with httpx.Client(transport=transport) as http_client:
+        client = AIChatClient(
+            api_key="test-key",
+            base_url="https://ai.example.com/v1",
+            model="actual-model",
+            http_client=http_client,
+            pricing_model="another-model",
+            input_price_per_million_tokens=Decimal("9"),
+            output_price_per_million_tokens=Decimal("9"),
+        )
+        client.generate(make_prompt())
+
+    assert client.last_usage is not None
+    assert client.last_usage.total_tokens == 15
+    assert client.last_usage.estimated_total_cost_yuan is None
+    assert "不匹配" in client.last_usage.pricing_note
 
 
 def test_ai_client_rejects_missing_configuration() -> None:
@@ -81,6 +133,22 @@ def test_ai_client_handles_provider_error() -> None:
             http_client=http_client,
         )
         with pytest.raises(AIProviderError, match="429"):
+            client.generate(make_prompt())
+
+
+def test_ai_client_reports_timeout_separately() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        raise httpx.ReadTimeout("timed out", request=request)
+
+    with httpx.Client(transport=httpx.MockTransport(handler)) as http_client:
+        client = AIChatClient(
+            api_key="test-key",
+            base_url="https://ai.example.com/v1",
+            model="test-model",
+            timeout_seconds=60,
+            http_client=http_client,
+        )
+        with pytest.raises(AIProviderError, match="超过 60 秒"):
             client.generate(make_prompt())
 
 
